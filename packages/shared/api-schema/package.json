@@ -1,0 +1,9 @@
+{
+  "name": "@repo/shared-api-schema",
+  "description": "API schema for the project",
+  "version": "0.0.0",
+  "exports": {
+    "./*": "./src/model/*.json"
+  },
+  "private": true
+}

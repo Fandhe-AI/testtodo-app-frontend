@@ -1,0 +1,138 @@
+---
+alwaysApply: true
+---
+
+# Feature Sliced Design ルール
+このプロジェクトは [Feature Sliced Design (FSD)](https://feature-sliced.design/) アーキテクチャパターンに従います。
+
+## レイヤー構造
+プロジェクトは以下のレイヤーで構成されます（上から下へ）：
+
+1. **app** - アプリケーションの初期化、ルーティング、プロバイダー設定
+2. **pages** - ページコンポーネント（Next.js App Routerの場合は `app/` ディレクトリ）
+3. **widgets** - 複合的なUIブロック（複数のfeatures/entitiesを組み合わせたもの）
+4. **features** - ビジネス機能（ユーザーアクション、機能固有のロジック）
+5. **entities** - ビジネスエンティティ（ユーザー、商品、注文など）
+6. **shared** - 共有コード（UI、ユーティリティ、設定など）
+
+## セグメント構造
+各スライス（レイヤー内の機能単位）は`src/`ディレクトリ配下に以下のセグメントで構成されます：
+
+- **src/ui/** - UIコンポーネント
+- **src/model/** - ビジネスロジック、状態管理（Store、hooks、types）
+- **src/api/** - API呼び出し、データフェッチング
+- **src/lib/** - ヘルパー関数、ユーティリティ
+- **src/config/** - 設定ファイル
+- **src/types/** - TypeScript型定義
+
+## インポートルール
+
+### 許可されるインポート
+- 下位レイヤーから上位レイヤーへのインポート（縦方向）
+  - `app` → `pages`, `widgets`, `features`, `entities`, `shared`
+  - `pages` → `widgets`, `features`, `entities`, `shared`
+  - `widgets` → `features`, `entities`, `shared`
+  - `features` → `entities`, `shared`
+  - `entities` → `shared`
+- `shared` に限り、同じレイヤー内のスライス間のインポート（横方向）
+
+### 禁止されるインポート
+- 上位レイヤーから下位レイヤーへのインポート
+  - ❌ `shared` → `entities`
+  - ❌ `entities` → `features`
+  - ❌ `features` → `widgets`
+  - ❌ `widgets` → `pages`
+  - ❌ `pages` → `app`
+- 同じスライス内での循環依存
+- スライス間の直接的な横方向の依存（必要に応じて上位レイヤーを経由）
+
+## ディレクトリ構造の例
+
+```
+/
+├── apps/                           # アプリケーション初期化
+│   ├── app/                        # アプリ画面
+│   └── mock/                       # API のモックサーバー
+└── packages/                       # アプリケーション初期化
+    ├── pages/                      # Next.js App Routerの app/ で使用する画面
+    │   ├── layout-[page-name]/src  # アプリ画面で使用するレイアウト
+    │   │   ├── ui/
+    │   │   └── model/
+    │   └── [page-name]/src         # アプリ画面で使用する画面
+    │       ├── ui/
+    │       └── model/
+    ├── widgets/                    # 複合UIブロック
+    │   └── [widget-name]/src
+    │       ├── ui/
+    │       └── model/
+    ├── features/                   # ビジネス機能
+    │   └── [feature-name]/src
+    │       ├── ui/
+    │       ├── model/
+    │       └── api/
+    ├── entities/                   # ビジネスエンティティ
+    │   └── [entity-name]/src
+    │       ├── ui/
+    │       ├── model/
+    │       └── api/
+    └── shared/                     # 共有コード
+        ├── api-spec/               # APIのSwagger
+        ├── api-*/                  # API設定（Kubbでの自動生成、変更不可）
+        ├── config-*/               # 共通の設定
+        ├── constant/               # プロジェクトの固定値
+        ├── lib-*/                  # 調整したライブラリ
+        ├── ui-icon/                # アイコンのコンポーネント
+        ├── ui-layout/              # スタイルを除いたロジックのみのコンポーネント
+        ├── ui-partial/             # スタイルのみのコンポーネント
+        └── util-*/                 # ユーティリティ
+```
+
+## 命名規則
+- **スライス名**: kebab-case（例: `user-profile`, `todo-list`）
+- **セグメント名**: 小文字（例: `ui`, `model`, `api`）
+- **ファイル名**: kebab-case（例: `user-card.tsx`, `use-todo-list.ts`）
+- **コンポーネント名**: PascalCase（例: `UserCard`, `TodoList`）
+- **フック名**: `use` プレフィックス（例: `useTodoList`, `useUserProfile`）
+
+## 実装ガイドライン
+
+### 1. スライスの分割
+- 各スライスは独立したビジネス機能またはエンティティを表す
+- スライスは再利用可能で、他のスライスに依存しない
+- 必要に応じて上位レイヤーを経由して他のスライスと連携
+
+### 2. セグメントの使用
+- **src/ui/**: プレゼンテーション層のコンポーネントのみ
+- **src/model/**: ビジネスロジック、状態管理、型定義
+- **src/api/**: データフェッチング、APIクライアント
+- **src/lib/**: スライス固有のヘルパー関数
+- **src/config/**: スライス固有の設定
+
+### 3. 共有コードの配置
+- 複数のスライスで使用されるコードは `shared/` に配置
+- スライス固有のコードは各スライス内に配置
+- `shared/ui-layout/`, `shared/ui-partial` は汎用的なUIコンポーネント（Button, Input, Modalなど）
+
+### 4. 状態管理
+- グローバル状態は `entities` または `features` の `src/model/` に配置
+- ローカル状態はコンポーネント内で管理
+- 状態管理ライブラリ（Zustand、Reduxなど）は `src/model/` 内で使用
+
+### 5. API呼び出し
+- APIクライアントは `shared/api-*/src/` に生成
+- エンドポイント固有のロジックは `features` または `entities` の `src/api/` に配置
+- APIレスポンスの型定義は `src/model/types/` に配置
+
+## チェックリスト
+新しい機能を追加する際は以下を確認：
+
+- [ ] 適切なレイヤーに配置されているか
+- [ ] スライス名が明確で一貫性があるか
+- [ ] セグメントが適切に分離されているか
+- [ ] インポートルールに従っているか
+- [ ] 共有コードは `shared/` に配置されているか
+- [ ] 命名規則に従っているか
+
+## 参考リンク
+- [Feature Sliced Design 公式ドキュメント](https://feature-sliced.design/)
+- [FSD アーキテクチャガイド](https://feature-sliced.design/docs/get-started/overview)

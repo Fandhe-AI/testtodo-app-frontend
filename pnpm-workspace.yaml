@@ -1,0 +1,17 @@
+packages:
+  - apps/*
+  - packages/pages/*
+  - packages/widgets/*
+  - packages/features/*
+  - packages/entities/*
+  - packages/shared/*
+
+ignoredBuiltDependencies:
+  - es5-ext
+  - esbuild
+  - msw
+  - sharp
+
+onlyBuiltDependencies:
+  - better-sqlite3
+  - lefthook

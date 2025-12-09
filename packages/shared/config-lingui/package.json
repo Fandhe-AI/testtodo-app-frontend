@@ -1,0 +1,26 @@
+{
+  "name": "@repo/shared-config-lingui",
+  "description": "Lingui config for the project",
+  "version": "0.0.0",
+  "dependencies": {},
+  "devDependencies": {
+    "@lingui/cli": "5.6.1",
+    "@lingui/format-json": "5.6.1",
+    "@repo/shared-config-typescript": "workspace:*",
+    "@repo/shared-constant": "workspace:*",
+    "typescript": "5"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./config": "./lingui.config.ts"
+  },
+  "private": true,
+  "scripts": {
+    "check:type": "tsc --noEmit",
+    "generate": "pnpm run lingui:extract && pnpm run lingui:compile",
+    "lingui": "lingui",
+    "lingui:compile": "lingui compile --typescript",
+    "lingui:extract": "lingui extract",
+    "lingui:template": "lingui extract-template"
+  }
+}

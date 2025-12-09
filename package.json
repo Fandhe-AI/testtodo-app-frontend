@@ -1,0 +1,48 @@
+{
+  "name": "mcps-app-frontend",
+  "devDependencies": {
+    "@biomejs/biome": "2.3.8",
+    "@commitlint/cli": "20.2.0",
+    "@repo/shared-config-biome": "workspace:*",
+    "@repo/shared-config-commitlint": "workspace:*",
+    "@repo/shared-config-syncpack": "workspace:*",
+    "@repo/shared-config-typescript": "workspace:*",
+    "lefthook": "2.0.9",
+    "syncpack": "14.0.0-alpha.32",
+    "tsx": "4.21.0",
+    "turbo": "2.6.3",
+    "typescript": "5"
+  },
+  "engines": {
+    "node": "22.21.1",
+    "pnpm": "10.24.0",
+    "npm": "use pnpm please!",
+    "yarn": "use pnpm please!"
+  },
+  "packageManager": "pnpm@10.24.0",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "check:type": "turbo run check:type",
+    "dev": "turbo run dev",
+    "format": "biome format .",
+    "format:fix": "biome format --write .",
+    "generate": "turbo run generate",
+    "generate:api": "turbo run generate --filter=@repo/shared-config-kubb",
+    "generate:locale": "turbo run generate --filter=@repo/shared-config-lingui",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "lint:fix:unsafe": "biome check --write . --unsafe",
+    "package:fix": "syncpack fix",
+    "package:format": "syncpack format --check",
+    "package:format:fix": "syncpack format",
+    "package:lint:fix": "syncpack lint",
+    "package:list": "syncpack list",
+    "package:update": "syncpack update --check",
+    "package:update:fix": "syncpack update"
+  },
+  "volta": {
+    "node": "22.21.1",
+    "pnpm": "10.24.0"
+  }
+}

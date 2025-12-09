@@ -1,0 +1,8 @@
+{
+  "extends": "@repo/shared-config-typescript/react-library",
+  "compilerOptions": {
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}

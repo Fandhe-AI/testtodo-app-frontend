@@ -1,0 +1,778 @@
+openapi: 3.0.6
+info:
+  title: Todo API
+  description: |
+    Todo アプリケーション用の RESTful API 仕様書
+
+    このAPIでは以下の機能を提供します:
+    - Todo アイテムの作成、取得、更新、削除
+    - Todo の完了状態の管理
+    - Todo の優先度設定
+    - Todo のカテゴリ分類
+    - Todo の検索とフィルタリング
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+
+servers:
+  - url: https://api.todo.fandhe.com
+    description: 本番環境
+  - url: https://stg-api.todo.fandhe.com
+    description: ステージング環境
+  - url: http://dev-api.todo.fandhe.com
+    description: 開発環境
+  - url: http://localhost:8000/todo
+    description: ローカル
+
+tags:
+  - name: health
+    description: 健康状態の確認
+  - name: todos
+    description: Todo アイテムの管理
+  - name: categories
+    description: カテゴリの管理
+
+paths:
+  /health:
+    get:
+      tags: [health]
+      summary: 健康状態の確認
+      description: サーバーの健康状態を確認します。
+      security: []
+      responses:
+        "200":
+          description: 健康状態の確認に成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                status: ok
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  # ==========================================================================
+  # Todo API
+  # ==========================================================================
+
+  /todos:
+    get:
+      tags: [todos]
+      summary: Todo リストの取得
+      description: |
+        Todo アイテムのリストを取得します。
+        クエリパラメータを使用してフィルタリングや並び替えが可能です。
+      parameters:
+        - name: status
+          in: query
+          description: Todo の完了状態でフィルタリング
+          schema:
+            type: string
+            enum: [pending, completed, all]
+            default: all
+          example: pending
+        - name: category
+          in: query
+          description: カテゴリ ID でフィルタリング
+          schema:
+            type: string
+          example: work
+        - name: priority
+          in: query
+          description: 優先度でフィルタリング
+          schema:
+            type: string
+            enum: [low, medium, high]
+          example: high
+        - name: search
+          in: query
+          description: タイトルや説明での検索
+          schema:
+            type: string
+          example: 会議
+        - name: page
+          in: query
+          description: ページ番号（1から開始）
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          example: 1
+        - name: limit
+          in: query
+          description: 1ページあたりの件数
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          example: 20
+        - name: sort
+          in: query
+          description: 並び替えフィールド
+          schema:
+            type: string
+            enum: [created_at, updated_at, due_date, priority, title]
+            default: created_at
+          example: due_date
+        - name: order
+          in: query
+          description: 並び替え順序
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          example: asc
+      responses:
+        "200":
+          description: Todo リストの取得に成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Todo"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+                required: [data, pagination]
+              example:
+                data:
+                  - id: todo-001
+                    title: プロジェクト企画書の作成
+                    description: 新製品のプロジェクト企画書を作成し、関係者にレビューを依頼する
+                    status: pending
+                    priority: high
+                    category_id: work
+                    due_date: '2024-01-31T15:00:00Z'
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T09:00:00Z'
+                  - id: todo-002
+                    title: 牛乳を買う
+                    description: null
+                    status: pending
+                    priority: low
+                    category_id: personal
+                    due_date: null
+                    created_at: '2024-01-19T18:30:00Z'
+                    updated_at: '2024-01-19T18:30:00Z'
+                pagination:
+                  page: 1
+                  limit: 20
+                  total: 42
+                  total_pages: 3
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    post:
+      tags: [todos]
+      summary: 新しい Todo の作成
+      description: |
+        新しい Todo アイテムを作成します。
+        タイトルは必須項目です。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTodoRequest"
+            example:
+              title: チームミーティングの準備
+              description: 来週のチームミーティングのアジェンダを作成し、資料を準備する
+              priority: medium
+              category_id: work
+              due_date: '2024-01-28T14:00:00Z'
+      responses:
+        "201":
+          description: Todo の作成に成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+              example:
+                id: todo-003
+                title: チームミーティングの準備
+                description: 来週のチームミーティングのアジェンダを作成し、資料を準備する
+                status: pending
+                priority: medium
+                category_id: work
+                due_date: '2024-01-28T14:00:00Z'
+                created_at: '2024-01-21T10:15:00Z'
+                updated_at: '2024-01-21T10:15:00Z'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /todos/{todoId}:
+    parameters:
+      - name: todoId
+        in: path
+        required: true
+        description: Todo の一意識別子
+        schema:
+          type: string
+        example: todo-001
+    get:
+      tags: [todos]
+      summary: 特定の Todo の取得
+      description: 指定された ID の Todo アイテムの詳細を取得します。
+      responses:
+        "200":
+          description: Todo の取得に成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+              example:
+                id: todo-001
+                title: プロジェクト企画書の作成
+                description: 新製品のプロジェクト企画書を作成し、関係者にレビューを依頼する
+                status: pending
+                priority: high
+                category_id: work
+                due_date: '2024-01-31T15:00:00Z'
+                created_at: '2024-01-20T09:00:00Z'
+                updated_at: '2024-01-20T09:00:00Z'
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    put:
+      tags: [todos]
+      summary: Todo の更新
+      description: |
+        指定された ID の Todo アイテムを更新します。
+        部分的な更新も可能です（提供されたフィールドのみが更新されます）。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTodoRequest"
+            example:
+              title: プロジェクト企画書の作成（更新版）
+              description: 新製品のプロジェクト企画書を作成し、関係者にレビューを依頼する。マーケティング部門の意見も含める。
+              status: completed
+              priority: high
+      responses:
+        "200":
+          description: Todo の更新に成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+              example:
+                id: todo-001
+                title: プロジェクト企画書の作成（更新版）
+                description: 新製品のプロジェクト企画書を作成し、関係者にレビューを依頼する。マーケティング部門の意見も含める。
+                status: completed
+                priority: high
+                category_id: work
+                due_date: '2024-01-31T15:00:00Z'
+                created_at: '2024-01-20T09:00:00Z'
+                updated_at: '2024-01-21T11:30:00Z'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    delete:
+      tags: [todos]
+      summary: Todo の削除
+      description: |
+        指定された ID の Todo アイテムを削除します。
+        この操作は元に戻せません。
+      responses:
+        "200":
+          description: Todo の削除に成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomSuccess"
+              example:
+                success: true
+                message: Todo の削除に成功しました
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /todos/{todoId}/toggle:
+    parameters:
+      - name: todoId
+        in: path
+        required: true
+        description: Todo の一意識別子
+        schema:
+          type: string
+        example: todo-001
+    patch:
+      tags: [todos]
+      summary: Todo の完了状態の切り替え
+      description: |
+        Todo の完了状態を切り替えます。
+        pending の場合は completed に、completed の場合は pending に変更されます。
+      responses:
+        "200":
+          description: 完了状態の切り替えに成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+              example:
+                id: todo-001
+                title: プロジェクト企画書の作成
+                description: 新製品のプロジェクト企画書を作成し、関係者にレビューを依頼する
+                status: completed
+                priority: high
+                category_id: work
+                due_date: '2024-01-31T15:00:00Z'
+                created_at: '2024-01-20T09:00:00Z'
+                updated_at: '2024-01-21T12:00:00Z'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /categories:
+    get:
+      tags: [categories]
+      summary: カテゴリリストの取得
+      description: 利用可能なカテゴリのリストを取得します。
+      responses:
+        "200":
+          description: カテゴリリストの取得に成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Category"
+                required: [data]
+              example:
+                data:
+                  - id: work
+                    name: 仕事
+                    description: 職場や業務に関連するタスク
+                    color: "#3b82f6"
+                    created_at: '2024-01-01T00:00:00Z'
+                  - id: personal
+                    name: 個人
+                    description: 個人的な用事やタスク
+                    color: "#10b981"
+                    created_at: '2024-01-01T00:00:00Z'
+                  - id: shopping
+                    name: 買い物
+                    description: 購入予定のアイテム
+                    color: "#f59e0b"
+                    created_at: '2024-01-01T00:00:00Z'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    post:
+      tags: [categories]
+      summary: 新しいカテゴリの作成
+      description: 新しいカテゴリを作成します。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCategoryRequest"
+            example:
+              name: 学習
+              description: 勉強や学習に関するタスク
+              color: "#8b5cf6"
+      responses:
+        "201":
+          description: カテゴリの作成に成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+              example:
+                id: study
+                name: 学習
+                description: 勉強や学習に関するタスク
+                color: "#8b5cf6"
+                created_at: '2024-01-21T13:00:00Z'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      description: 健康状態のレスポンス
+      properties:
+        status:
+          type: string
+          description: 健康状態
+          example: ok
+
+    # ==========================================================================
+    # Todo 関連スキーマ
+    # ==========================================================================
+
+    Todo:
+      type: object
+      description: Todo アイテムを表現するオブジェクト
+      properties:
+        id:
+          type: string
+          description: Todo の一意識別子
+          example: todo-001
+        title:
+          type: string
+          description: Todo のタイトル（必須）
+          minLength: 1
+          maxLength: 200
+          example: プロジェクト企画書の作成
+        description:
+          type: string
+          nullable: true
+          description: Todo の詳細説明（任意）
+          maxLength: 1000
+          example: 新製品のプロジェクト企画書を作成し、関係者にレビューを依頼する
+        status:
+          type: string
+          description: Todo の完了状態
+          enum: [pending, completed]
+          example: pending
+        priority:
+          type: string
+          description: Todo の優先度
+          enum: [low, medium, high]
+          example: high
+        category_id:
+          type: string
+          nullable: true
+          description: 関連するカテゴリの ID（任意）
+          example: work
+        due_date:
+          type: string
+          format: date-time
+          nullable: true
+          description: 期限日時（ISO 8601形式、任意）
+          example: '2024-01-31T15:00:00Z'
+        created_at:
+          type: string
+          format: date-time
+          description: 作成日時（ISO 8601形式）
+          example: '2024-01-20T09:00:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          description: 最終更新日時（ISO 8601形式）
+          example: '2024-01-20T09:00:00Z'
+      required:
+        - id
+        - title
+        - status
+        - priority
+        - created_at
+        - updated_at
+
+    CreateTodoRequest:
+      type: object
+      description: Todo 作成時のリクエストボディ
+      properties:
+        title:
+          type: string
+          description: Todo のタイトル（必須）
+          minLength: 1
+          maxLength: 200
+          example: チームミーティングの準備
+        description:
+          type: string
+          nullable: true
+          description: Todo の詳細説明（任意）
+          maxLength: 1000
+          example: 来週のチームミーティングのアジェンダを作成し、資料を準備する
+        priority:
+          type: string
+          description: "Todo の優先度（デフォルト: medium）"
+          enum: [low, medium, high]
+          default: medium
+          example: medium
+        category_id:
+          type: string
+          nullable: true
+          description: 関連するカテゴリの ID（任意）
+          example: work
+        due_date:
+          type: string
+          format: date-time
+          nullable: true
+          description: 期限日時（ISO 8601形式、任意）
+          example: '2024-01-28T14:00:00Z'
+      required: [title]
+
+    UpdateTodoRequest:
+      type: object
+      description: Todo 更新時のリクエストボディ（部分更新対応）
+      properties:
+        title:
+          type: string
+          description: Todo のタイトル
+          minLength: 1
+          maxLength: 200
+          example: プロジェクト企画書の作成（更新版）
+        description:
+          type: string
+          nullable: true
+          description: Todo の詳細説明
+          maxLength: 1000
+          example: 新製品のプロジェクト企画書を作成し、関係者にレビューを依頼する。マーケティング部門の意見も含める。
+        status:
+          type: string
+          description: Todo の完了状態
+          enum: [pending, completed]
+          example: completed
+        priority:
+          type: string
+          description: Todo の優先度
+          enum: [low, medium, high]
+          example: high
+        category_id:
+          type: string
+          nullable: true
+          description: 関連するカテゴリの ID
+          example: work
+        due_date:
+          type: string
+          format: date-time
+          nullable: true
+          description: 期限日時（ISO 8601形式）
+          example: '2024-01-31T15:00:00Z'
+
+    Category:
+      type: object
+      description: カテゴリを表現するオブジェクト
+      properties:
+        id:
+          type: string
+          description: カテゴリの一意識別子
+          example: work
+        name:
+          type: string
+          description: カテゴリ名
+          minLength: 1
+          maxLength: 50
+          example: 仕事
+        description:
+          type: string
+          nullable: true
+          description: カテゴリの説明
+          maxLength: 200
+          example: 職場や業務に関連するタスク
+        color:
+          type: string
+          description: カテゴリの表示色（HEXカラーコード）
+          pattern: "^#[0-9a-fA-F]{6}$"
+          example: "#3b82f6"
+        created_at:
+          type: string
+          format: date-time
+          description: 作成日時（ISO 8601形式）
+          example: '2024-01-01T00:00:00Z'
+      required: [id, name, color, created_at]
+
+    CreateCategoryRequest:
+      type: object
+      description: カテゴリ作成時のリクエストボディ
+      properties:
+        name:
+          type: string
+          description: カテゴリ名（必須）
+          minLength: 1
+          maxLength: 50
+          example: 学習
+        description:
+          type: string
+          nullable: true
+          description: カテゴリの説明（任意）
+          maxLength: 200
+          example: 勉強や学習に関するタスク
+        color:
+          type: string
+          description: カテゴリの表示色（HEXカラーコード、必須）
+          pattern: "^#[0-9a-fA-F]{6}$"
+          example: "#8b5cf6"
+      required: [name, color]
+
+    Pagination:
+      type: object
+      description: ページネーション情報
+      properties:
+        page:
+          type: integer
+          description: 現在のページ番号
+          minimum: 1
+          example: 1
+        limit:
+          type: integer
+          description: 1ページあたりの件数
+          minimum: 1
+          example: 20
+        total:
+          type: integer
+          description: 総件数
+          minimum: 0
+          example: 42
+        total_pages:
+          type: integer
+          description: 総ページ数
+          minimum: 0
+          example: 3
+      required: [page, limit, total, total_pages]
+
+    CustomSuccess:
+      type: object
+      description: 成功情報
+      properties:
+        success:
+          type: boolean
+          description: 成功フラグ
+          example: true
+        message:
+          type: string
+          description: 成功メッセージ
+          example: リクエストが成功しました
+      required: [success]
+
+    CustomError:
+      type: object
+      description: エラー情報
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              description: エラーコード
+              example: VALIDATION_ERROR
+            message:
+              type: string
+              description: エラーメッセージ
+              example: リクエストの内容に不備があります
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                    description: エラーが発生したフィールド名
+                    example: title
+                  message:
+                    type: string
+                    description: フィールド固有のエラーメッセージ
+                    example: タイトルは必須項目です
+                required: [field, message]
+              description: 詳細なエラー情報（バリデーションエラー時など）
+          required: [code, message]
+      required: [error]
+
+  responses:
+    BadRequest:
+      description: リクエストが不正です
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CustomError"
+          example:
+            error:
+              code: BAD_REQUEST
+              message: リクエストの形式が正しくありません
+    Unauthorized:
+      description: 認証が必要です
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CustomError"
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: 認証が必要です。有効なアクセストークンを提供してください
+    NotFound:
+      description: リソースが見つかりません
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CustomError"
+          example:
+            error:
+              code: NOT_FOUND
+              message: 指定されたリソースが見つかりません
+    ValidationError:
+      description: バリデーションエラー
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CustomError"
+          example:
+            error:
+              code: VALIDATION_ERROR
+              message: 入力内容に不備があります
+              details:
+                - field: title
+                  message: タイトルは必須項目です
+                - field: due_date
+                  message: 期限日時は有効な日時形式で入力してください
+    InternalServerError:
+      description: サーバー内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CustomError"
+          example:
+            error:
+              code: INTERNAL_SERVER_ERROR
+              message: サーバー内部でエラーが発生しました。しばらく時間をおいて再度お試しください
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT ベースの認証。
+        ログイン API で取得したアクセストークンを使用してください。
+
+        例: `Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
+
+security:
+  - BearerAuth: []

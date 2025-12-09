@@ -1,0 +1,287 @@
+---
+alwaysApply: true
+---
+
+# API ガイドライン
+
+## API自動生成
+
+### Kubbによる自動生成
+- **自動生成パッケージ**: `packages/shared/api-*/`内のファイルはKubbで自動生成されます
+- **編集禁止**: 自動生成ファイルは直接編集しないでください
+- **再生成**: API仕様変更後は`pnpm generate:api`で再生成してください
+
+### 生成されるパッケージ
+
+#### @repo/shared-api-client
+- **用途**: APIクライアント関数
+- **使用方法**: 直接APIを呼び出す
+
+```typescript
+// ✅ Good
+import { getTodos } from "@repo/shared-api-client";
+
+const todos = await getTodos({ limit: 10 });
+```
+
+#### @repo/shared-api-handler
+- **用途**: APIハンドラー（MSW用/モックAPIハンドラ）
+- **使用方法**: MSW( [Mock Service Worker](https://mswjs.io/) ) でAPI通信をモックしたい時に使用
+
+```typescript
+// ✅ Good - msw handler定義例
+import { getTodosHandler } from "@repo/shared-api-handler";
+import { rest } from "msw";
+
+export const handlers = [
+  getTodosHandler(rest)
+];
+```
+
+> **Note:**
+> `@repo/shared-api-handler` は Next.js の Route Handler 用ではなく、`msw`(Mock Service Worker)でAPIリクエストをモックするためのハンドラーを自動生成するパッケージです。実際のAPIサーバーの実装やNext.js のAPI Routeでは使用しません。
+
+#### @repo/shared-api-mock
+- **用途**: モックデータ生成
+- **使用方法**: テストや開発時に使用
+
+```typescript
+// ✅ Good
+import { createGetTodos } from "@repo/shared-api-mock";
+
+const mockData = createGetTodos();
+```
+
+#### @repo/shared-api-type
+- **用途**: TypeScript型定義
+- **使用方法**: 型定義として使用
+
+```typescript
+// ✅ Good
+import type { GetTodosQueryResponse } from "@repo/shared-api-type";
+
+const todos: GetTodosQueryResponse = await getTodos();
+```
+
+#### @repo/shared-api-zod
+- **用途**: Zodスキーマ
+- **使用方法**: バリデーションに使用
+
+```typescript
+// ✅ Good
+import { getTodosQueryResponseSchema } from "@repo/shared-api-zod";
+
+const validatedData = getTodosQueryResponseSchema.parse(data);
+```
+
+## APIクライアントの使用
+
+### 基本的な使用方法
+- **型安全**: 自動生成された型を使用することで、型安全が保証されます
+- **エラーハンドリング**: 適切にエラーハンドリングを行ってください
+
+```typescript
+// ✅ Good
+import { getTodos } from "@repo/shared-api-client";
+import type { GetTodosQueryResponse } from "@repo/shared-api-type";
+
+try {
+  const todos: GetTodosQueryResponse = await getTodos({ limit: 10 });
+  return todos;
+} catch (error) {
+  console.error("Failed to fetch todos:", error);
+  throw error;
+}
+```
+
+### カスタムクライアント
+- **fetchのカスタマイズ**: 必要に応じてカスタムfetchを渡すことができます
+
+```typescript
+// ✅ Good
+import { getTodos } from "@repo/shared-api-client";
+
+const customFetch = async (url: string, options?: RequestInit) => {
+  // カスタムロジック（認証ヘッダー追加など）
+  return fetch(url, options);
+};
+
+const todos = await getTodos({ limit: 10 }, { client: customFetch });
+```
+
+## MSW用APIハンドラーの使用
+
+### MSWでの使用方法
+- **ハンドラー関数**: 自動生成されたMSW用APIハンドラー関数を使用し、rest/GraphQLリクエストのモックに利用できます
+
+```typescript
+// ✅ Good - MSWのハンドラーとして利用
+import { getTodosHandler, postTodosHandler } from "@repo/shared-api-handler";
+import { rest } from "msw";
+
+export const handlers = [
+  getTodosHandler(rest),
+  postTodosHandler(rest)
+];
+```
+
+### カスタムロジックの追加
+- **ラッパー関数**: MSWハンドラーをラップして追加処理を付加することも可能です
+
+```typescript
+// ✅ Good
+import { getTodosHandler } from "@repo/shared-api-handler";
+import { rest } from "msw";
+
+const loggingGetTodosHandler = (rest: typeof import("msw").rest) =>
+  getTodosHandler(rest, {
+    middleware: async (req, res, ctx, next) => {
+      console.log("GET Todos called", req.url.toString());
+      return next();
+    }
+  });
+
+export const handlers = [loggingGetTodosHandler(rest)];
+```
+
+## バリデーション
+
+### Zodスキーマの使用
+- **リクエストバリデーション**: リクエストデータ・レスポンスデータ等のバリデーションにZodスキーマを利用できます
+
+```typescript
+// ✅ Good
+import { postTodosSchema } from "@repo/shared-api-zod";
+
+export async function POST(request: Request) {
+  const body = await request.json();
+
+  // バリデーション
+  const validatedData = postTodosSchema.parse(body);
+
+  // 処理を続行
+  return createTodo(validatedData);
+}
+```
+
+### レスポンスバリデーション
+- **レスポンスバリデーション**: レスポンスデータをバリデーション（開発時）
+
+```typescript
+// ✅ Good - 開発時のみ
+import { getTodosQueryResponseSchema } from "@repo/shared-api-zod";
+
+if (process.env.NODE_ENV === "development") {
+  const validatedData = getTodosQueryResponseSchema.parse(data);
+}
+```
+
+## エラーハンドリング
+
+### エラータイプ
+- **型安全なエラー**: 自動生成されたエラータイプを使用
+
+```typescript
+// ✅ Good
+import { getTodos } from "@repo/shared-api-client";
+import type { GetTodos400, GetTodos401, GetTodos500 } from "@repo/shared-api-type";
+
+try {
+  const todos = await getTodos();
+} catch (error) {
+  if (error.status === 400) {
+    // GetTodos400の処理
+  } else if (error.status === 401) {
+    // GetTodos401の処理
+  } else if (error.status === 500) {
+    // GetTodos500の処理
+  }
+}
+```
+
+### エラーレスポンス
+- **適切なステータスコード**: エラーに応じた適切なステータスコードを返す
+
+```typescript
+// ✅ Good
+export async function POST(request: Request) {
+  try {
+    const data = await request.json();
+    const validatedData = postTodosSchema.parse(data);
+    const todo = await createTodo(validatedData);
+    return NextResponse.json(todo, { status: 201 });
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return NextResponse.json(
+        { error: "Invalid request data" },
+        { status: 400 }
+      );
+    }
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+```
+
+## モックデータ
+
+### 開発時の使用
+- **モックデータ生成**: 開発時にモックデータを使用
+
+```typescript
+// ✅ Good - 開発時のみ
+import { createGetTodos } from "@repo/shared-api-mock";
+
+if (process.env.NODE_ENV === "development") {
+  const mockTodos = createGetTodos();
+}
+```
+
+### テストでの使用
+- **テストデータ**: テストでモックデータを使用
+
+```typescript
+// ✅ Good
+import { createGetTodos } from "@repo/shared-api-mock";
+
+describe("TodoList", () => {
+  it("should render todos", () => {
+    const mockTodos = createGetTodos();
+    render(<TodoList todos={mockTodos} />);
+    // テストを続行
+  });
+});
+```
+
+## API仕様の更新
+
+### 更新手順
+1. **API仕様更新**: OpenAPI/Swagger仕様を更新する
+2. **再生成**: `pnpm generate:api`で再生成する
+3. **型チェック**: `pnpm check:type`で型エラーを確認する
+4. **コード更新**: 必要に応じてコードを更新する
+
+### 破壊的変更
+- **型エラー**: 破壊的変更がある場合は型エラーが発生します
+- **段階的更新**: 可能な限り段階的に更新してください
+
+## ベストプラクティス
+
+### 型安全性
+- **型の活用**: 自動生成された型を最大限活用する
+- **型インポート**: `import type`で型のみをインポート
+
+### エラーハンドリング
+- **適切な処理**: エラーに応じた適切な処理を実装
+- **ユーザーフレンドリー**: ユーザーに分かりやすいエラーメッセージ
+
+### パフォーマンス
+- **キャッシュ**: 適切にキャッシュを活用
+- **リクエスト最適化**: 不要なリクエストを避ける
+
+### セキュリティ
+- **認証**: 適切に認証を実装
+- **バリデーション**: すべての入力データをバリデーション
+- **エラーメッセージ**: 機密情報をエラーメッセージに含めない

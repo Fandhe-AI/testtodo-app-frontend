@@ -1,0 +1,19 @@
+pre-commit:
+  parallel: true
+  commands:
+    check:type:
+      run: pnpm check:type
+    format:
+      run: pnpm format
+      stage_fixed: true
+    lint:
+      run: pnpm lint
+      stage_fixed: true
+    package:format:
+      run: pnpm package:format
+      stage_fixed: true
+
+commit-msg:
+  commands:
+    "lint commit message":
+      run: pnpm exec commitlint --edit {1}

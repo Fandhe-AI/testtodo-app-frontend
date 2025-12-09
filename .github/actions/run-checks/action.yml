@@ -1,0 +1,31 @@
+name: 'Run code quality checks'
+description: 'Run linting, formatting, and type checking'
+
+inputs:
+  checks:
+    description: 'Comma-separated list of checks to run (lint,format,check:type,package:format)'
+    required: false
+    default: 'lint,format,check:type,package:format'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Check package format
+      if: contains(inputs.checks, 'package:format')
+      run: pnpm run package:format
+      shell: bash
+
+    - name: Run Biome lint
+      if: contains(inputs.checks, 'lint')
+      run: pnpm run lint
+      shell: bash
+
+    - name: Run Biome format
+      if: contains(inputs.checks, 'format')
+      run: pnpm run format
+      shell: bash
+
+    - name: Check TypeScript
+      if: contains(inputs.checks, 'check:type')
+      run: pnpm run check:type
+      shell: bash

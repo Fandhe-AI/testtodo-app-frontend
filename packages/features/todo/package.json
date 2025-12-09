@@ -1,0 +1,36 @@
+{
+  "name": "@repo/features-todo",
+  "description": "Todo feature components (FSD)",
+  "version": "0.0.0",
+  "dependencies": {
+    "@conform-to/react": "1.14.1",
+    "@conform-to/zod": "1.14.1",
+    "@repo/entities-todo": "workspace:*",
+    "@repo/shared-api-client": "workspace:*",
+    "@repo/shared-api-type": "workspace:*",
+    "@repo/shared-api-zod": "workspace:*",
+    "@repo/shared-lib-pino": "workspace:*",
+    "react": "19.2.1",
+    "react-dom": "19.2.1",
+    "zod": "4.1.13"
+  },
+  "devDependencies": {
+    "@repo/shared-config-kubb": "workspace:*",
+    "@repo/shared-config-typescript": "workspace:*",
+    "@types/node": "24.10.2",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "typescript": "5"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./package.json": "./package.json",
+    "./ui/*": "./src/ui/*/index.tsx",
+    "./model": "./src/model/index.ts"
+  },
+  "private": true,
+  "scripts": {
+    "check:type": "tsc --noEmit"
+  },
+  "type": "module"
+}

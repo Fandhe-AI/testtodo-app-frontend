@@ -1,0 +1,26 @@
+{
+  "name": "@repo/shared-lib-auth",
+  "description": "Better Auth library wrapper for the project",
+  "version": "0.0.0",
+  "dependencies": {
+    "@repo/shared-lib-pino": "workspace:*",
+    "better-auth": "1.4.6"
+  },
+  "devDependencies": {
+    "@repo/shared-config-typescript": "workspace:*",
+    "@types/node": "24.10.2",
+    "next": "16.0.8",
+    "typescript": "5"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./server": "./src/lib/create-auth.ts",
+    "./client": "./src/lib/create-auth-client.ts",
+    "./proxy": "./src/lib/create-auth-proxy.ts",
+    "./type": "./src/type/index.ts"
+  },
+  "private": true,
+  "scripts": {
+    "check:type": "tsc --noEmit"
+  }
+}

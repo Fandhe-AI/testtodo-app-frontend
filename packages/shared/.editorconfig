@@ -1,0 +1,11 @@
+root = false
+
+[api-*/src/model/*/**]
+insert_final_newline = false
+trim_trailing_whitespace = false
+max_line_length = unset
+
+[config-kubb/src/.kubb/**]
+insert_final_newline = false
+trim_trailing_whitespace = false
+max_line_length = unset

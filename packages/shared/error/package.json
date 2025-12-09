@@ -1,0 +1,19 @@
+{
+  "name": "@repo/shared-error",
+  "description": "Error utilities for the project",
+  "version": "0.0.0",
+  "dependencies": {
+    "zod": "4.1.13"
+  },
+  "devDependencies": {
+    "@repo/shared-config-typescript": "workspace:*",
+    "typescript": "5"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "private": true,
+  "scripts": {
+    "check:type": "tsc --noEmit"
+  }
+}

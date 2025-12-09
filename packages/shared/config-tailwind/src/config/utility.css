@@ -1,0 +1,9 @@
+/** グリッドエリアのテンプレート定義 */
+@utility grid-areas-* {
+  grid-template-areas: --value([\*]);
+}
+
+/** グリッドエリアの配置 */
+@utility grid-area-* {
+  grid-area: --value([\*]);
+}

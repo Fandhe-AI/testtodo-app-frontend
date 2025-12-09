@@ -1,0 +1,278 @@
+---
+alwaysApply: true
+---
+
+# コーディング規約
+
+## TypeScript
+
+### 型定義
+- **厳格な型チェック**: `any`の使用は避け、適切な型を定義する
+- **型推論の活用**: 可能な限り型推論を使用し、冗長な型注釈を避ける
+- **型のエクスポート**: 外部から使用される型は必ずエクスポートする
+
+```typescript
+// ✅ Good
+export type User = {
+  id: string;
+  name: string;
+};
+
+// ❌ Bad
+export const user: any = { id: "1", name: "John" };
+```
+
+### 関数定義
+- **アロー関数 vs 関数宣言**: アロー関数を推奨
+- **非同期処理**: `async/await`を使用し、Promiseチェーンは避ける
+
+```typescript
+// ✅ Good
+export const fetchUser = async (id: string): Promise<User> => {
+  const response = await fetch(`/api/users/${id}`);
+  return response.json();
+}
+
+// ❌ Bad
+export function fetchUser(id: string) {
+  return fetch(`/api/users/${id}`).then((res) => res.json());
+}
+```
+
+### インポート/エクスポート
+- **名前付きエクスポートを優先**: デフォルトエクスポートは必要な場合のみ
+- **インポート順序**:
+  1. 外部ライブラリ
+  2. 内部パッケージ（`@repo/*`）
+  3. 相対パス
+- **型インポート**: 型のみのインポートは`import type`を使用
+
+```typescript
+// ✅ Good
+import { useState } from "react";
+import type { User } from "@repo/shared-api-type";
+import { Button } from "../ui/button";
+
+// ❌ Bad
+import { useState, type User } from "react";
+```
+
+## React
+
+### コンポーネント
+- **関数コンポーネント**: クラスコンポーネントは使用しない
+- **Props型定義**: Propsは型定義を明示的に記述
+
+```typescript
+// ✅ Good
+type Props = {
+  title: string;
+  onClick?: () => void;
+};
+
+export const Button = ({ title, onClick }: Props) => {
+  return <button onClick={onClick}>{title}</button>;
+}
+
+// ❌ Bad
+export function Button(props: any) {
+  return <button>{props.title}</button>;
+}
+```
+
+### Hooks
+- **カスタムフック**: `use`プレフィックスを使用
+- **依存配列**: `useEffect`、`useMemo`、`useCallback`の依存配列を適切に設定
+
+```typescript
+// ✅ Good
+export function useUser(id: string) {
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    fetchUser(id).then(setUser);
+  }, [id]);
+
+  return user;
+}
+```
+
+### Next.js App Router
+- **Server Components**: デフォルトでServer Componentsを使用
+- **Client Components**: インタラクティブな機能が必要な場合のみ`"use client"`を使用
+- **データフェッチング**: Server Componentsで直接データフェッチ、Client Componentsでは`useEffect`やSWR/React Queryを使用
+
+```typescript
+// ✅ Good - Server Component
+export default async () => {
+  const data = await fetchData();
+  return <div>{data}</div>;
+}
+
+// ✅ Good - Client Component
+"use client";
+export const InteractiveButton = () => {
+  const [count, setCount] = useState(0);
+  return <button onClick={() => setCount(count + 1)}>{count}</button>;
+}
+```
+
+## ファイル命名規則
+
+### ファイル名
+- **kebab-case**: ファイル名はkebab-caseを使用
+- **拡張子**:
+  - `.tsx` - Reactコンポーネント
+  - `.ts` - TypeScriptファイル
+  - `.css` - CSSファイル（Tailwind使用のため通常不要）
+
+```typescript
+// ✅ Good
+user-profile.tsx
+use-todo-list.ts
+api-client.ts
+
+// ❌ Bad
+UserProfile.tsx
+useTodoList.ts
+apiClient.ts
+```
+
+### コンポーネント名
+- **PascalCase**: コンポーネント名はPascalCase
+
+```typescript
+// ✅ Good
+export const TodoList = () => {};
+
+// ❌ Bad
+export const todoList = () => {};
+```
+
+### フック名
+- **useプレフィックス**: カスタムフックは`use`で始める
+
+```typescript
+// ✅ Good
+export function useUser() {}
+export function useTodoList() {}
+
+// ❌ Bad
+export function getUser() {}
+export function todoList() {}
+```
+
+## コードスタイル
+
+### フォーマット
+- **Biome**: コードフォーマットはBiomeに従う
+- **自動フォーマット**: コミット前に`pnpm format:fix`を実行
+
+### インデント
+- **2スペース**: インデントは2スペース
+
+### セミコロン
+- **必須**: セミコロンは必須（Biome設定に従う）
+
+### クォート
+- **ダブルクォート**: 文字列はダブルクォートを使用（Biome設定に従う）
+
+## エラーハンドリング
+
+### エラー処理
+- **明示的なエラーハンドリング**: try-catchを使用
+- **エラーメッセージ**: ユーザーフレンドリーなエラーメッセージを提供
+
+```typescript
+// ✅ Good
+try {
+  const user = await fetchUser(id);
+  return user;
+} catch (error) {
+  console.error("Failed to fetch user:", error);
+  throw new Error("ユーザーの取得に失敗しました");
+}
+```
+
+### 型安全なエラーハンドリング
+- **Result型**: 可能な限りResult型パターンを使用
+
+```typescript
+// ✅ Good
+type Result<T, E = Error> =
+  | { success: true; data: T }
+  | { success: false; error: E };
+
+export async function safeFetchUser(id: string): Promise<Result<User>> {
+  try {
+    const user = await fetchUser(id);
+    return { success: true, data: user };
+  } catch (error) {
+    return { success: false, error: error as Error };
+  }
+}
+```
+
+## コメント
+
+### ドキュメントコメント
+- **JSDoc**: 公開APIにはJSDocコメントを記述
+
+```typescript
+// ✅ Good
+/**
+ * ユーザー情報を取得します
+ * @param id - ユーザーID
+ * @returns ユーザー情報
+ * @throws {Error} ユーザーが見つからない場合
+ */
+export async function fetchUser(id: string): Promise<User> {
+  // ...
+}
+```
+
+### インラインコメント
+- **必要最小限**: コードが自明な場合はコメントを避ける
+- **理由を説明**: 「何をしているか」ではなく「なぜそうしているか」を説明
+
+```typescript
+// ✅ Good
+// APIレート制限を回避するため、リクエストをバッチ処理
+const batchedRequests = batchRequests(requests);
+
+// ❌ Bad
+// リクエストをバッチ処理
+const batchedRequests = batchRequests(requests);
+```
+
+## パフォーマンス
+
+### 最適化
+- **React Compiler（Next.js App Routerの場合）**: `next.config.js`で`reactCompiler: true`を設定し、自動的なレンダリング最適化を活用
+- **React.memo**: 手動でのメモ化が必要な場合のみ使用（React Compiler利用時は基本不要）
+- **useMemo / useCallback**: 「参照が変わることでパフォーマンス劣化が大きい」場面など、本当に必要な箇所のみ利用（React Compiler利用時は多くの場合不要）
+- **コード分割**: `dynamic import`でコンポーネントごとに分割
+
+```typescript
+// ✅ Good: 動的importによるコード分割（Next.js）
+import dynamic from "next/dynamic";
+const HeavyComponent = dynamic(() => import("./heavy-component"));
+
+// ✅ Good: React Compiler利用時は通常 useMemo/useCallback/React.memo の明示は不要
+```
+
+#### Next.js + React Compilerの設定例
+
+```js
+// next.config.js
+module.exports = {
+  reactCompiler: true,
+};
+```
+
+> **備考:**
+> React Compilerを有効化すると、React.memo、useMemo、useCallbackの多用は推奨されません。パフォーマンス最適化が自動で行われるため、本当に必要な場合のみ明示的に使ってください。
+
+### バンドルサイズ
+- **不要なインポート**: 使用していないインポートを削除
+- **Tree shaking**: 名前付きエクスポートを優先

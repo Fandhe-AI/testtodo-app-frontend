@@ -1,0 +1,29 @@
+{
+  "name": "mock",
+  "version": "0.1.0",
+  "dependencies": {
+    "@repo/shared-api-handler": "workspace:*",
+    "better-auth": "1.4.6",
+    "better-sqlite3": "12.5.0",
+    "next": "16.0.8",
+    "react": "19.2.1",
+    "react-dom": "19.2.1"
+  },
+  "devDependencies": {
+    "@repo/shared-config-typescript": "workspace:*",
+    "@types/better-sqlite3": "7.6.13",
+    "@types/node": "24.10.2",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "msw": "2.12.4",
+    "typescript": "5"
+  },
+  "private": true,
+  "scripts": {
+    "check:type": "next typegen && tsc --noEmit",
+    "db:generate": "pnpm dlx @better-auth/cli@latest generate",
+    "db:migrate": "pnpm dlx @better-auth/cli@latest migrate",
+    "dev": "next dev --turbopack --port 8000"
+  },
+  "type": "module"
+}

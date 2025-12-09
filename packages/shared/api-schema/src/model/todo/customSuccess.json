@@ -1,0 +1,1 @@
+{"type":"object","description":"成功情報","properties":{"success":{"type":"boolean","description":"成功フラグ","example":true},"message":{"type":"string","description":"成功メッセージ","example":"リクエストが成功しました"}},"required":["success"],"x-readme-ref-name":"CustomSuccess"}

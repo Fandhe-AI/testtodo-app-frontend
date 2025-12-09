@@ -1,0 +1,6 @@
+{
+  "name": "@repo/shared-api-spec",
+  "description": "API specification for the project",
+  "version": "0.0.0",
+  "private": true
+}

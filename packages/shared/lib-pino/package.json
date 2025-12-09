@@ -1,0 +1,20 @@
+{
+  "name": "@repo/shared-lib-pino",
+  "description": "Pino library for the project",
+  "version": "0.0.0",
+  "dependencies": {
+    "pino": "10.1.0"
+  },
+  "devDependencies": {
+    "@repo/shared-config-typescript": "workspace:*",
+    "pino-pretty": "13.1.3",
+    "typescript": "5"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "private": true,
+  "scripts": {
+    "check:type": "tsc --noEmit"
+  }
+}

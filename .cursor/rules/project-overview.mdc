@@ -1,0 +1,135 @@
+---
+alwaysApply: true
+---
+
+# プロジェクト概要
+
+このプロジェクトは **MCPS Web Frontend** で、モノレポ構成のNext.jsアプリケーションです。
+
+## 技術スタック
+
+### コア技術
+- **Next.js 16.0.3** (App Router)
+- **React 19.2.0**
+- **TypeScript 5**
+- **Node.js 22.21.1** (Voltaで管理)
+- **pnpm 10.24.0** (パッケージマネージャー)
+
+### モノレポ構成
+- **Turborepo 2.6.1** - ビルドシステムとタスクオーケストレーション
+- **pnpm workspace** - パッケージ管理
+
+### コード品質
+- **Biome 2.3.7** - Linter/Formatter (ESLint/Prettierの代替)
+- **TypeScript** - 型チェック
+- **Lefthook 2.0.4** - Git hooks管理
+- **Commitlint** - コミットメッセージのリント
+
+### スタイリング
+- **Tailwind CSS 4.1.17** - ユーティリティファーストCSS
+- **PostCSS 8.5.6**
+
+### API関連
+- **Kubb** - OpenAPI/SwaggerからTypeScript型とクライアントを自動生成
+- API自動生成パッケージ:
+  - `@repo/shared-api-client` - APIクライアント
+  - `@repo/shared-api-handler` - APIハンドラー
+  - `@repo/shared-api-mock` - モックデータ
+  - `@repo/shared-api-type` - TypeScript型定義
+  - `@repo/shared-api-zod` - Zodスキーマ
+
+### その他
+- **Pino 10.1.0** - ログライブラリ
+- **React Compiler** - React 19のコンパイラ
+
+## プロジェクト構造
+
+```
+mcps-app-frontend/
+├── apps/                    # アプリケーション
+│   ├── app/                 # Next.jsアプリ (メインアプリ)
+│   └── mock/                # APIモックサーバー
+├── packages/                 # 共有パッケージ
+│   ├── pages/               # ページコンポーネント (FSD)
+│   ├── widgets/             # ウィジェット (FSD)
+│   ├── features/            # 機能 (FSD)
+│   ├── entities/            # エンティティ (FSD)
+│   └── shared/              # 共有コード (FSD)
+│       ├── api-*/           # API関連パッケージ
+│       ├── config-*/        # 設定パッケージ
+│       ├── ui-*/            # UIコンポーネント
+│       ├── lib-*/           # ライブラリ
+│       └── util-*/          # ユーティリティ
+└── [設定ファイル]
+```
+
+## アーキテクチャ
+
+このプロジェクトは **Feature Sliced Design (FSD)** アーキテクチャパターンに従います。
+詳細は `.cursor/rules/feature-sliced-design.mdc` を参照してください。
+
+## 開発環境セットアップ
+
+### 前提条件
+- Node.js 22.21.1 (Volta推奨)
+- pnpm 10.24.0
+
+### セットアップ手順
+
+```bash
+# 1. 依存関係のインストール
+make setup
+# または
+pnpm install
+
+# 2. 環境変数の設定
+# - apps/app/.env
+# - apps/mock/.env
+# - packages/shared/config-kubb/.env
+
+# 3. Git hooksのインストール
+pnpm exec lefthook install
+```
+
+## 主要コマンド
+
+### 開発
+```bash
+pnpm dev                    # 全アプリを開発モードで起動
+pnpm dev --filter=app       # 特定のアプリのみ起動
+```
+
+### ビルド
+```bash
+pnpm build                  # 全パッケージをビルド
+pnpm build --filter=app     # 特定のパッケージのみビルド
+```
+
+### コード品質
+```bash
+pnpm lint                   # リントチェック
+pnpm lint:fix               # リント修正
+pnpm format                 # フォーマットチェック
+pnpm format:fix             # フォーマット修正
+pnpm check:type             # 型チェック
+```
+
+### API生成
+```bash
+pnpm generate:api           # APIクライアント/型を生成
+```
+
+### パッケージ管理
+```bash
+pnpm package:list           # パッケージバージョン一覧
+pnpm package:update         # パッケージ更新チェック
+pnpm package:update:fix     # パッケージ更新
+```
+
+## 重要な注意事項
+
+1. **API自動生成ファイル**: `packages/shared/api-*/` 内のファイルはKubbで自動生成されるため、直接編集しないでください。
+2. **pnpm必須**: npmやyarnは使用せず、必ずpnpmを使用してください。
+3. **FSDアーキテクチャ**: インポートルールとレイヤー構造を厳守してください。
+4. **型安全性**: TypeScriptの型を最大限活用し、`any`の使用は避けてください。
+5. **Biome設定**: コードフォーマットとリントはBiomeを使用します。

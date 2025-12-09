@@ -1,0 +1,16 @@
+{
+  "name": "@repo/shared-api-handler",
+  "description": "API handler for the project",
+  "version": "0.0.0",
+  "devDependencies": {
+    "@repo/shared-config-typescript": "workspace:*",
+    "msw": "2.12.4",
+    "typescript": "5"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./auth": "./src/model/auth/index.ts",
+    "./todo": "./src/model/todo/index.ts"
+  },
+  "private": true
+}

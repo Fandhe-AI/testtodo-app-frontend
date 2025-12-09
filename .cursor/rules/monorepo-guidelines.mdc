@@ -1,0 +1,210 @@
+---
+alwaysApply: true
+---
+
+# モノレポガイドライン
+
+## パッケージ管理
+
+### pnpm必須
+- **pnpmのみ使用**: npmやyarnは使用しない
+- **workspace**: pnpm workspaceを活用
+- **バージョン管理**: syncpackでパッケージバージョンを統一
+
+```bash
+# ✅ Good
+pnpm install
+pnpm add <package> --filter <workspace>
+
+# ❌ Bad
+npm install
+yarn add <package>
+```
+
+### パッケージ追加
+- **適切な場所**: パッケージを追加する際は適切なworkspaceに追加
+- **依存関係**: 共有パッケージは`packages/shared/`に、アプリ固有は`apps/`に
+
+```bash
+# 共有パッケージに追加
+pnpm add <package> --filter @repo/shared-<name>
+
+# アプリに追加
+pnpm add <package> --filter app
+```
+
+### バージョン管理
+- **syncpack**: パッケージバージョンはsyncpackで管理
+- **更新チェック**: `pnpm package:update`で更新を確認
+- **統一**: 同じパッケージは全workspaceで同じバージョンを使用
+
+```bash
+# バージョン確認
+pnpm package:list
+
+# 更新チェック
+pnpm package:update
+
+# 更新実行
+pnpm package:update:fix
+```
+
+## Turborepo
+
+### タスク実行
+- **フィルター**: 特定のパッケージのみ実行する場合は`--filter`を使用
+- **依存関係**: Turborepoが自動的に依存関係を解決
+
+```bash
+# 全パッケージをビルド
+pnpm build
+
+# 特定のパッケージのみビルド
+pnpm build --filter=app
+
+# 依存関係も含めてビルド
+pnpm build --filter=app...
+```
+
+### キャッシュ
+- **自動キャッシュ**: Turborepoが自動的にビルド結果をキャッシュ
+- **キャッシュクリア**: 必要に応じて`turbo clean`でキャッシュをクリア
+
+### タスク定義
+- **turbo.json**: タスクの依存関係と入出力を定義
+- **並列実行**: 可能な限り並列実行を活用
+
+## ワークスペース構造
+
+### パッケージ命名
+- **@repo/プレフィックス**: すべてのパッケージは`@repo/`で始まる
+- **命名規則**:
+  - `@repo/shared-<name>` - 共有パッケージ
+  - `@repo/pages-<name>` - ページパッケージ
+  - `@repo/widgets-<name>` - ウィジェットパッケージ
+  - `@repo/features-<name>` - 機能パッケージ
+  - `@repo/entities-<name>` - エンティティパッケージ
+
+### パッケージ間の依存関係
+- **FSDルール**: Feature Sliced Designのインポートルールに従う
+- **循環依存**: 循環依存を避ける
+- **peerDependencies**: 共有依存関係はpeerDependenciesとして定義
+
+### 型定義の共有
+- **型エクスポート**: 他のパッケージから使用される型は必ずエクスポート
+- **型インポート**: `import type`を使用して型のみをインポート
+
+```typescript
+// packages/shared/api-type/src/index.ts
+export type { User } from "./model/user";
+
+// packages/features/user-profile/src/model/index.ts
+import type { User } from "@repo/shared-api-type";
+```
+
+## ビルドと開発
+
+### 開発モード
+- **並列実行**: 複数のアプリを同時に開発可能
+- **ウォッチモード**: ファイル変更を自動検知
+
+```bash
+# 全アプリを開発モードで起動
+pnpm dev
+
+# 特定のアプリのみ起動
+pnpm dev --filter=app
+```
+
+### ビルド
+- **依存関係**: 依存関係を自動的に解決してビルド
+- **キャッシュ**: 変更がないパッケージは再ビルドしない
+
+```bash
+# 全パッケージをビルド
+pnpm build
+
+# 特定のパッケージのみビルド
+pnpm build --filter=app
+```
+
+## 環境変数
+
+### 環境変数の管理
+- **.env.example**: 各パッケージに`.env.example`を配置
+- **.env**: `.env`はgitignoreに含める
+- **Makefile**: `make setup`で環境変数ファイルを自動生成
+
+### 環境変数の使用
+- **Next.js**: `apps/app/.env`で環境変数を定義
+- **Kubb**: `packages/shared/config-kubb/.env`でAPI URLを定義
+- **型安全**: 環境変数は型定義を提供
+
+## API自動生成
+
+### Kubb設定
+- **自動生成**: `packages/shared/api-*/`内のファイルは自動生成
+- **編集禁止**: 自動生成ファイルは直接編集しない
+- **再生成**: API仕様変更後は`pnpm generate:api`で再生成
+
+### 生成されるパッケージ
+- `@repo/shared-api-client` - APIクライアント関数
+- `@repo/shared-api-handler` - MSWのAPIハンドラー
+- `@repo/shared-api-mock` - モックデータ生成
+- `@repo/shared-api-type` - TypeScript型定義
+- `@repo/shared-api-zod` - Zodスキーマ
+
+### 使用方法
+```typescript
+// ✅ Good - 自動生成されたAPIクライアントを使用
+import { getTodos } from "@repo/shared-api-client";
+
+const todos = await getTodos();
+
+// ❌ Bad - 自動生成ファイルを直接編集
+// packages/shared/api-client/src/model/.../getTodos.ts を編集
+```
+
+## Gitワークフロー
+
+### コミット
+- **Commitlint**: コミットメッセージはCommitlintルールに従う
+- **Lefthook**: コミット前に自動的にリント/フォーマット/型チェック
+
+### ブランチ戦略
+- **main**: 本番環境用ブランチ
+- **develop**: 開発用ブランチ
+- **feature/**: 機能追加ブランチ
+- **fix/**: バグ修正ブランチ
+
+### プルリクエスト
+- **型チェック**: プルリクエスト前に`pnpm check:type`を実行
+- **リント**: プルリクエスト前に`pnpm lint`を実行
+- **ビルド**: プルリクエスト前に`pnpm build`を実行
+
+## トラブルシューティング
+
+### 依存関係の問題
+```bash
+# node_modulesを削除して再インストール
+rm -rf node_modules packages/*/node_modules apps/*/node_modules
+pnpm install
+```
+
+### キャッシュの問題
+```bash
+# Turborepoキャッシュをクリア
+pnpm exec turbo clean
+
+# pnpmキャッシュをクリア
+pnpm store prune
+```
+
+### 型エラーの問題
+```bash
+# 型チェックを実行
+pnpm check:type
+
+# 特定のパッケージのみ型チェック
+pnpm check:type --filter=app
+```

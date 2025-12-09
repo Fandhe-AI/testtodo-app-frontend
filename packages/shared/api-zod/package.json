@@ -1,0 +1,19 @@
+{
+  "name": "@repo/shared-api-zod",
+  "description": "API Zod for the project",
+  "version": "0.0.0",
+  "dependencies": {
+    "@kubb/plugin-zod": "4.10.0",
+    "zod": "4.1.13"
+  },
+  "devDependencies": {
+    "@repo/shared-config-typescript": "workspace:*",
+    "typescript": "5"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./auth": "./src/model/auth/index.ts",
+    "./todo": "./src/model/todo/index.ts"
+  },
+  "private": true
+}

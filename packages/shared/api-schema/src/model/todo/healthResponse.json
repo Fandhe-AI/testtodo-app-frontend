@@ -1,0 +1,1 @@
+{"type":"object","description":"健康状態のレスポンス","properties":{"status":{"type":"string","description":"健康状態","example":"ok"}},"x-readme-ref-name":"HealthResponse"}

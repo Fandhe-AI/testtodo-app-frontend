@@ -1,0 +1,33 @@
+{
+  "name": "@repo/features-auth",
+  "description": "Authentication feature components",
+  "version": "0.0.0",
+  "dependencies": {
+    "@conform-to/react": "1.14.1",
+    "@conform-to/zod": "1.14.1",
+    "@repo/shared-api-zod": "workspace:*",
+    "next": "16.0.8",
+    "react": "19.2.1",
+    "zod": "4.1.13"
+  },
+  "devDependencies": {
+    "@repo/shared-config-typescript": "workspace:*",
+    "@repo/shared-lib-auth": "workspace:*",
+    "@types/node": "24.10.2",
+    "@types/react": "19.2.7",
+    "typescript": "5"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/index.client.ts",
+    "./package.json": "./package.json",
+    "./ui/*": "./src/ui/*/index.tsx"
+  },
+  "peerDependencies": {
+    "@repo/shared-lib-auth": "workspace:*"
+  },
+  "private": true,
+  "scripts": {
+    "check:type": "tsc --noEmit"
+  }
+}

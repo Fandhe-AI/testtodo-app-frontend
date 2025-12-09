@@ -1,0 +1,29 @@
+name: PRのチェック
+
+on:
+  pull_request:
+
+jobs:
+  reviewdog:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - uses: mongolyy/reviewdog-action-biome@v1
+        with:
+          github_token: ${{ secrets.github_token }}
+          fail_level: "warning"
+
+  editorconfig-checker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - uses: editorconfig-checker/action-editorconfig-checker@main
+
+      - run: editorconfig-checker

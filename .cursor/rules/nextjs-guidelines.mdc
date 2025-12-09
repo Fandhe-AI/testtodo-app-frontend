@@ -1,0 +1,304 @@
+---
+alwaysApply: true
+---
+
+# Next.js ガイドライン
+
+## App Router
+
+### ルーティング
+- **ファイルベースルーティング**: `app/`ディレクトリ内のファイル構造でルーティング
+- **特殊ファイル**:
+  - `page.tsx` - ページコンポーネント
+  - `layout.tsx` - レイアウトコンポーネント
+  - `loading.tsx` - ローディングUI
+  - `error.tsx` - エラーUI
+  - `not-found.tsx` - 404ページ
+
+### Server Components vs Client Components
+- **デフォルトはServer Component**: 特別な理由がない限りServer Componentを使用
+- **"use client"**: インタラクティブな機能（useState、useEffect、イベントハンドラ）が必要な場合のみ使用
+
+```typescript
+// ✅ Good - Server Component (デフォルト)
+export default async function Page() {
+  const data = await fetchData();
+  return <div>{data}</div>;
+}
+
+// ✅ Good - Client Component (必要な場合のみ)
+"use client";
+import { useState } from "react";
+
+export function Counter() {
+  const [count, setCount] = useState(0);
+  return <button onClick={() => setCount(count + 1)}>{count}</button>;
+}
+```
+
+### データフェッチング
+
+#### Server Components
+- **直接fetch**: Server Componentsでは直接`fetch`を使用
+- **キャッシュ**: Next.jsが自動的にキャッシュを管理
+
+```typescript
+// ✅ Good
+export default async function Page() {
+  const res = await fetch("https://api.example.com/data", {
+    next: { revalidate: 3600 }, // 1時間キャッシュ
+  });
+  const data = await res.json();
+  return <div>{data}</div>;
+}
+```
+
+#### Client Components
+- **useEffect**: Client Componentsでは`useEffect`でデータフェッチ
+
+```typescript
+// ✅ Good
+"use client";
+import { useEffect, useState } from "react";
+
+export function ClientData() {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/data")
+      .then((res) => res.json())
+      .then(setData);
+  }, []);
+
+  return <div>{data}</div>;
+}
+```
+
+### メタデータ
+- **Metadata API**: `metadata`オブジェクトまたは`generateMetadata`関数を使用
+
+```typescript
+// ✅ Good
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Page Title",
+  description: "Page description",
+};
+
+// ✅ Good - 動的メタデータ
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const data = await fetchData(params.id);
+  return {
+    title: data.title,
+  };
+}
+```
+
+## API Routes
+
+### Route Handlers
+- **app/api/**: `app/api/`ディレクトリにRoute Handlerを配置
+- **HTTPメソッド**: 関数名でHTTPメソッドを指定（GET、POST、PUT、DELETEなど）
+
+```typescript
+// ✅ Good - app/api/users/route.ts
+import { NextResponse } from "next/server";
+
+export async function GET() {
+  const users = await getUsers();
+  return NextResponse.json(users);
+}
+
+export async function POST(request: Request) {
+  const body = await request.json();
+  const user = await createUser(body);
+  return NextResponse.json(user, { status: 201 });
+}
+```
+
+### Server Actions
+- **"use server"**: Server Actionsには`"use server"`ディレクティブを使用
+- **ファイル分離**: Server Actionsは別ファイルに分離することを推奨
+
+```typescript
+// ✅ Good - app/actions/user.ts
+"use server";
+
+export async function createUser(data: UserData) {
+  // サーバー側の処理
+  return await saveUser(data);
+}
+
+// ✅ Good - コンポーネントで使用
+import { createUser } from "./actions/user";
+
+export function UserForm() {
+  return (
+    <form action={createUser}>
+      {/* フォーム */}
+    </form>
+  );
+}
+```
+
+## スタイリング
+
+### Tailwind CSS
+- **ユーティリティクラス**: Tailwindのユーティリティクラスを使用
+- **カスタムクラス**: 必要に応じて`@apply`でカスタムクラスを定義
+
+```typescript
+// ✅ Good
+export function Button() {
+  return (
+    <button className="px-4 py-2 bg-blue-500 text-white rounded">
+      Click me
+    </button>
+  );
+}
+```
+
+### CSS Modules
+- **必要な場合のみ**: Tailwindで対応できない場合のみCSS Modulesを使用
+- **スコープ**: CSS Modulesは自動的にスコープされる
+
+### グローバルスタイル
+- **globals.css**: `app/globals.css`にグローバルスタイルを定義
+- **Tailwindディレクティブ**: `@tailwind`ディレクティブを含める
+
+## パフォーマンス最適化
+
+### 画像最適化
+- **next/image**: `next/image`コンポーネントを使用
+
+```typescript
+// ✅ Good
+import Image from "next/image";
+
+export function ProfileImage() {
+  return (
+    <Image
+      src="/profile.jpg"
+      alt="Profile"
+      width={200}
+      height={200}
+    />
+  );
+}
+```
+
+### コード分割
+- **動的インポート**: 大きなコンポーネントは動的インポートで分割
+
+```typescript
+// ✅ Good
+import dynamic from "next/dynamic";
+
+const HeavyComponent = dynamic(() => import("./heavy-component"), {
+  loading: () => <p>Loading...</p>,
+});
+```
+
+### ストリーミング
+- **Suspense**: データフェッチングにSuspenseを使用
+
+```typescript
+// ✅ Good
+import { Suspense } from "react";
+
+export default function Page() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <DataComponent />
+    </Suspense>
+  );
+}
+```
+
+## 環境変数
+
+### 環境変数の定義
+- **.env.local**: ローカル開発用（gitignore）
+- **.env.example**: 環境変数のテンプレート
+
+### 環境変数の使用
+- **NEXT_PUBLIC_**: クライアント側で使用する場合は`NEXT_PUBLIC_`プレフィックス
+- **型安全**: 環境変数は型定義を提供
+
+```typescript
+// ✅ Good
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+const secretKey = process.env.SECRET_KEY; // サーバー側のみ
+```
+
+## エラーハンドリング
+
+### Error Boundary
+- **error.tsx**: `error.tsx`でエラーハンドリング
+
+```typescript
+// ✅ Good - app/error.tsx
+"use client";
+
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  return (
+    <div>
+      <h2>Something went wrong!</h2>
+      <button onClick={reset}>Try again</button>
+    </div>
+  );
+}
+```
+
+### 404ページ
+- **not-found.tsx**: `not-found.tsx`で404ページを定義
+
+```typescript
+// ✅ Good - app/not-found.tsx
+export default function NotFound() {
+  return (
+    <div>
+      <h2>Not Found</h2>
+      <p>Could not find requested resource</p>
+    </div>
+  );
+}
+```
+
+## React Compiler
+
+### 設定
+- **next.config.ts**: React Compilerが有効化されている
+
+```typescript
+// ✅ Good - next.config.ts
+const nextConfig: NextConfig = {
+  reactCompiler: true,
+};
+```
+
+### 最適化
+- **自動最適化**: React Compilerが自動的にコンポーネントを最適化
+- **手動最適化不要**: `useMemo`や`useCallback`は通常不要（Compilerが最適化）
+
+## ベストプラクティス
+
+### ファイル構造
+- **FSD準拠**: Feature Sliced Designの構造に従う
+- **セグメント分離**: `ui/`、`model/`、`api/`を適切に分離
+
+### 型安全性
+- **型定義**: すべてのPropsとデータに型を定義
+- **型インポート**: `import type`で型のみをインポート
+
+### パフォーマンス
+- **Server Components**: 可能な限りServer Componentsを使用
+- **コード分割**: 大きなバンドルは分割
+- **画像最適化**: `next/image`を使用

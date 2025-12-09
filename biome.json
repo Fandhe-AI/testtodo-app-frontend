@@ -1,0 +1,23 @@
+{
+  "extends": [
+    "@repo/shared-config-biome/core",
+    "@repo/shared-config-biome/root",
+    "@repo/shared-config-biome/tailwind",
+    "@repo/shared-config-biome/import"
+  ],
+  "files": {
+    "includes": [
+      "apps/**",
+      "packages/**",
+      "!**/node_modules",
+      "!**/build",
+      "!**/dist",
+      "!**/storybook-static",
+      "!**/public",
+      "!**/*.css",
+
+      "!**/packages/shared/api-*",
+      "!**/packages/shared/config-kubb/src/.kubb/*"
+    ]
+  }
+}

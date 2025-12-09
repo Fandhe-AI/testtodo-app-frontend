@@ -1,0 +1,19 @@
+{
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "develop"
+  },
+  "linter": {
+    "rules": {
+      "correctness": {
+        "useUniqueElementIds": {
+          "options": {
+            "excludedComponents": ["Trans"]
+          }
+        }
+      }
+    }
+  }
+}

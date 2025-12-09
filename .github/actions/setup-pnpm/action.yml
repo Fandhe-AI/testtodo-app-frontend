@@ -1,0 +1,60 @@
+name: 'Setup pnpm and Node.js'
+description: 'Setup pnpm and Node.js environment with caching'
+
+inputs:
+  node-version:
+    description: 'Node.js version to use'
+    required: false
+    default: '22.21.1'
+  pnpm-version:
+    description: 'pnpm version to use'
+    required: false
+    default: '10.24.0'
+
+outputs:
+  cache-key:
+    description: 'Generated cache key'
+    value: ${{ steps.cache-key.outputs.value }}
+  store-path:
+    description: 'pnpm store path'
+    value: ${{ steps.pnpm-store.outputs.value }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Enable corepack
+      run: corepack enable
+      shell: bash
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: ${{ inputs.pnpm-version }}
+        run_install: false
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Get pnpm store directory
+      id: pnpm-store
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+    - name: Generate cache key
+      id: cache-key
+      shell: bash
+      run: |
+        echo "value=${{ hashFiles('pnpm-lock.yaml') }}" >> $GITHUB_OUTPUT
+
+    - name: Setup pnpm cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ github.head_ref }}-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ steps.cache-key.outputs.value }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-${{ github.head_ref }}-${{ hashFiles('**/pnpm-lock.yaml') }}-
+          ${{ runner.os }}-pnpm-store-${{ github.head_ref }}-
+          ${{ runner.os }}-pnpm-store-

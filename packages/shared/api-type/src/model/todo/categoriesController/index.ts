@@ -1,0 +1,2 @@
+export type { GetCategories200, GetCategories401, GetCategories500, GetCategoriesQueryResponse, GetCategoriesQuery } from "./GetCategories";
+export type { PostCategories201, PostCategories400, PostCategories401, PostCategories422, PostCategories500, PostCategoriesMutationRequest, PostCategoriesMutationResponse, PostCategoriesMutation } from "./PostCategories";

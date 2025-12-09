@@ -1,0 +1,29 @@
+{
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [
+        "build/**",
+        ".next/**",
+        "!.next/cache/**",
+        "storybook-static/**",
+        "dist/**"
+      ]
+    },
+    "check:type": {
+      "dependsOn": ["^check:type"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "generate": {
+      "dependsOn": ["^generate"],
+      "inputs": ["$TURBO_DEFAULT$", ".env.example", ".env"],
+      "outputs": ["src/**"],
+      "cache": false
+    }
+  }
+}

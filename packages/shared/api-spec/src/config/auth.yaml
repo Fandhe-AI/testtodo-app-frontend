@@ -1,0 +1,399 @@
+openapi: 3.0.6
+info:
+  title: Auth API
+  description: |
+    Auth アプリケーション用の RESTful API 仕様書
+
+    このAPIは Better Auth を使用した認証機能を提供します。
+    このAPIでは以下の機能を提供します:
+    - メールアドレスでのログイン
+    - メールアドレスでの新規登録
+    - ログアウト
+    - 現在のセッション情報の取得
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+
+servers:
+  - url: https://api.auth.fandhe.com
+    description: 本番環境
+  - url: https://stg-api.auth.fandhe.com
+    description: ステージング環境
+  - url: http://dev-api.auth.fandhe.com
+    description: 開発環境
+  - url: http://localhost:8000/auth
+    description: ローカル
+
+tags:
+  - name: health
+    description: 健康状態の確認
+  - name: auth
+    description: |
+      認証関連の API
+
+      **注意**: 認証は Better Auth を使用して Next.js アプリケーション内で処理されます。
+      このセクションのエンドポイントはドキュメント目的で記載しています。
+      実際の認証リクエストは `/*` に送信してください。
+
+paths:
+  /health:
+    get:
+      tags: [health]
+      summary: 健康状態の確認
+      description: サーバーの健康状態を確認します。
+      security: []
+      responses:
+        "200":
+          description: 健康状態の確認に成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                status: ok
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  # ==========================================================================
+  # 認証 API（Better Auth）
+  # ==========================================================================
+  # 注意: これらのエンドポイントは Next.js アプリケーション内の Better Auth が処理します。
+  # バックエンド API サーバーではなく、フロントエンドアプリケーションに送信してください。
+  # ==========================================================================
+
+  /sign-in/email:
+    post:
+      tags: [auth]
+      summary: メールアドレスでログイン
+      description: |
+        メールアドレスとパスワードでログインします。
+        成功すると、セッション Cookie が設定されます。
+
+        **注意**: このエンドポイントは Next.js アプリケーション（Better Auth）が処理します。
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignInEmailRequest"
+            example:
+              email: user@example.com
+              password: password123
+      responses:
+        "200":
+          description: ログイン成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthSession"
+              example:
+                user:
+                  id: user-001
+                  email: user@example.com
+                  name: 田中太郎
+                  emailVerified: true
+                  createdAt: '2024-01-01T00:00:00Z'
+                  updatedAt: '2024-01-01T00:00:00Z'
+                session:
+                  id: session-001
+                  userId: user-001
+                  expiresAt: '2024-01-08T00:00:00Z'
+        "401":
+          description: 認証失敗
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthError"
+              example:
+                code: INVALID_CREDENTIALS
+                message: メールアドレスまたはパスワードが正しくありません
+
+  /sign-up/email:
+    post:
+      tags: [auth]
+      summary: メールアドレスで新規登録
+      description: |
+        メールアドレスとパスワードで新規ユーザー登録を行います。
+        成功すると、セッション Cookie が設定されます。
+
+        **注意**: このエンドポイントは Next.js アプリケーション（Better Auth）が処理します。
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignUpEmailRequest"
+            example:
+              email: newuser@example.com
+              password: password123
+              name: 新規ユーザー
+      responses:
+        "200":
+          description: 登録成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthSession"
+        "400":
+          description: 登録失敗（メールアドレスが既に使用されているなど）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthError"
+              example:
+                code: USER_ALREADY_EXISTS
+                message: このメールアドレスは既に登録されています
+
+  /sign-out:
+    post:
+      tags: [auth]
+      summary: ログアウト
+      description: |
+        現在のセッションを終了し、ログアウトします。
+        セッション Cookie が削除されます。
+
+        **注意**: このエンドポイントは Next.js アプリケーション（Better Auth）が処理します。
+      security: []
+      responses:
+        "200":
+          description: ログアウト成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+
+  /session:
+    get:
+      tags: [auth]
+      summary: 現在のセッション情報を取得
+      description: |
+        現在ログインしているユーザーのセッション情報を取得します。
+        セッションが存在しない場合は null を返します。
+
+        **注意**: このエンドポイントは Next.js アプリケーション（Better Auth）が処理します。
+      security: []
+      responses:
+        "200":
+          description: セッション情報
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthSessionOrNull"
+              example:
+                user:
+                  id: user-001
+                  email: user@example.com
+                  name: 田中太郎
+                  emailVerified: true
+                  createdAt: '2024-01-01T00:00:00Z'
+                  updatedAt: '2024-01-01T00:00:00Z'
+                session:
+                  id: session-001
+                  userId: user-001
+                  expiresAt: '2024-01-08T00:00:00Z'
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      description: 健康状態のレスポンス
+      properties:
+        status:
+          type: string
+          description: 健康状態
+          example: ok
+
+    # ==========================================================================
+    # 認証関連スキーマ（Better Auth）
+    # ==========================================================================
+
+    SignInEmailRequest:
+      type: object
+      description: メールログインのリクエストボディ
+      properties:
+        email:
+          type: string
+          format: email
+          description: メールアドレス
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          description: パスワード
+          minLength: 8
+          example: password123
+      required: [email, password]
+
+    SignUpEmailRequest:
+      type: object
+      description: メール登録のリクエストボディ
+      properties:
+        email:
+          type: string
+          format: email
+          description: メールアドレス
+          example: newuser@example.com
+        password:
+          type: string
+          format: password
+          description: パスワード（8文字以上）
+          minLength: 8
+          example: password123
+        name:
+          type: string
+          description: ユーザー名
+          minLength: 1
+          maxLength: 100
+          example: 新規ユーザー
+      required: [email, password, name]
+
+    AuthUser:
+      type: object
+      description: 認証ユーザー情報
+      properties:
+        id:
+          type: string
+          description: ユーザーの一意識別子
+          example: user-001
+        email:
+          type: string
+          format: email
+          description: メールアドレス
+          example: user@example.com
+        name:
+          type: string
+          description: ユーザー名
+          example: 田中太郎
+        emailVerified:
+          type: boolean
+          description: メールアドレスが確認済みかどうか
+          example: true
+        image:
+          type: string
+          nullable: true
+          description: プロフィール画像の URL
+          example: https://example.com/avatar.png
+        createdAt:
+          type: string
+          format: date-time
+          description: アカウント作成日時
+          example: '2024-01-01T00:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: 最終更新日時
+          example: '2024-01-01T00:00:00Z'
+      required: [id, email, emailVerified, createdAt, updatedAt]
+
+    AuthSessionInfo:
+      type: object
+      description: セッション情報
+      properties:
+        id:
+          type: string
+          description: セッションの一意識別子
+          example: session-001
+        userId:
+          type: string
+          description: ユーザーの一意識別子
+          example: user-001
+        expiresAt:
+          type: string
+          format: date-time
+          description: セッションの有効期限
+          example: '2024-01-08T00:00:00Z'
+      required: [id, userId, expiresAt]
+
+    AuthSession:
+      type: object
+      description: 認証セッション（ユーザー情報とセッション情報を含む）
+      properties:
+        user:
+          $ref: "#/components/schemas/AuthUser"
+        session:
+          $ref: "#/components/schemas/AuthSessionInfo"
+      required: [user, session]
+
+    AuthError:
+      type: object
+      description: 認証エラー
+      properties:
+        code:
+          type: string
+          description: エラーコード
+          enum:
+            - INVALID_CREDENTIALS
+            - USER_NOT_FOUND
+            - USER_ALREADY_EXISTS
+            - INVALID_EMAIL
+            - WEAK_PASSWORD
+            - SESSION_EXPIRED
+            - UNAUTHORIZED
+          example: INVALID_CREDENTIALS
+        message:
+          type: string
+          description: エラーメッセージ
+          example: メールアドレスまたはパスワードが正しくありません
+      required: [code, message]
+
+    AuthSessionOrNull:
+      type: object
+      description: 認証セッション（存在しない場合は空オブジェクト）
+      nullable: true
+      properties:
+        user:
+          $ref: "#/components/schemas/AuthUser"
+        session:
+          $ref: "#/components/schemas/AuthSessionInfo"
+
+    CustomError:
+      type: object
+      description: エラー情報
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              description: エラーコード
+              example: VALIDATION_ERROR
+            message:
+              type: string
+              description: エラーメッセージ
+              example: リクエストの内容に不備があります
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                    description: エラーが発生したフィールド名
+                    example: title
+                  message:
+                    type: string
+                    description: フィールド固有のエラーメッセージ
+                    example: タイトルは必須項目です
+                required: [field, message]
+              description: 詳細なエラー情報（バリデーションエラー時など）
+          required: [code, message]
+      required: [error]
+
+  responses:
+    InternalServerError:
+      description: サーバー内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CustomError"
+          example:
+            error:
+              code: INTERNAL_SERVER_ERROR
+              message: サーバー内部でエラーが発生しました。しばらく時間をおいて再度お試しください

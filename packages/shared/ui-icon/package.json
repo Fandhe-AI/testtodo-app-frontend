@@ -1,0 +1,30 @@
+{
+  "name": "@repo/shared-ui-icon",
+  "version": "0.0.0",
+  "dependencies": {
+    "@repo/shared-config-tailwind": "workspace:*",
+    "@tailwindcss/postcss": "4.1.17",
+    "postcss": "8.5.6",
+    "react": "19.2.1",
+    "react-dom": "19.2.1",
+    "tailwindcss": "4.1.17"
+  },
+  "devDependencies": {
+    "@repo/shared-config-typescript": "workspace:*",
+    "@types/node": "24.10.2",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "typescript": "5"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": "./src/index.ts",
+    "./ui/*": "./src/ui/*/index.tsx"
+  },
+  "private": true,
+  "scripts": {
+    "check:types": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0"
+  },
+  "type": "module"
+}

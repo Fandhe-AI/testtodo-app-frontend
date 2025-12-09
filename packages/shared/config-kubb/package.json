@@ -1,0 +1,32 @@
+{
+  "name": "@repo/shared-config-kubb",
+  "description": "Kubb config for the project",
+  "version": "0.0.0",
+  "devDependencies": {
+    "@faker-js/faker": "10.1.0",
+    "@kubb/cli": "4.10.0",
+    "@kubb/core": "4.10.0",
+    "@kubb/plugin-client": "4.10.0",
+    "@kubb/plugin-faker": "4.10.0",
+    "@kubb/plugin-msw": "4.10.0",
+    "@kubb/plugin-oas": "4.10.0",
+    "@kubb/plugin-ts": "4.10.0",
+    "@kubb/plugin-zod": "4.10.0",
+    "@repo/shared-api-spec": "workspace:*",
+    "@repo/shared-config-biome": "workspace:*",
+    "@repo/shared-config-typescript": "workspace:*",
+    "@repo/shared-error": "workspace:*",
+    "@types/node": "24.10.2",
+    "dotenv": "17.2.3",
+    "msw": "2.12.4",
+    "typescript": "5"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "private": true,
+  "scripts": {
+    "check:type": "tsc --noEmit",
+    "generate": "kubb generate"
+  }
+}

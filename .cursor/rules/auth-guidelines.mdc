@@ -1,0 +1,248 @@
+---
+alwaysApply: true
+---
+
+# 認証ガイドライン
+
+## 概要
+
+このプロジェクトでは Better Auth を使用した Stateless Session Management を採用しています。
+認証機能は `@repo/shared-lib-auth` パッケージで提供され、アプリケーション固有の設定は `apps/app` で行います。
+
+## パッケージ構成
+
+### @repo/shared-lib-auth
+
+認証ライブラリのラッパーパッケージです。設定を外部から受け取り、認証機能を提供します。
+
+```typescript
+// サーバーサイド
+import { createAuth } from "@repo/shared-lib-auth/server";
+
+// クライアントサイド
+import { createAuthClient } from "@repo/shared-lib-auth/client";
+
+// ミドルウェア
+import { createAuthMiddleware } from "@repo/shared-lib-auth/middleware";
+
+// 型定義
+import type { AuthConfig, AuthClientConfig, AuthMiddlewareConfig } from "@repo/shared-lib-auth/types";
+```
+
+### @repo/features-auth
+
+認証機能のUIコンポーネントとフックを提供します。
+
+```typescript
+// UIコンポーネント
+import { LoginForm } from "@repo/features-auth/ui";
+
+// フックファクトリー
+import { createUseAuth } from "@repo/features-auth/model";
+```
+
+## セットアップ
+
+### 1. サーバーサイド認証設定
+
+```typescript
+// apps/app/src/lib/auth.ts
+import { createAuth } from "@repo/shared-lib-auth/server";
+
+export const auth = createAuth({
+  secret: process.env.AUTH_SESSION_SECRET,
+  baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
+  sessionMaxAge: 7 * 24 * 60 * 60, // 7日間
+});
+```
+
+### 2. クライアントサイド認証設定
+
+```typescript
+// apps/app/src/lib/auth-client.ts
+"use client";
+
+import { createAuthClient } from "@repo/shared-lib-auth/client";
+
+export const authClient = createAuthClient({
+  baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
+});
+
+export const { useSession, signIn, signOut } = authClient;
+```
+
+### 3. 認証ミドルウェア設定
+
+```typescript
+// apps/app/src/lib/auth-middleware.ts
+import { createAuthMiddleware } from "@repo/shared-lib-auth/middleware";
+import { auth } from "./auth";
+
+export const authMiddleware = createAuthMiddleware(auth, {
+  publicPaths: ["/login", "/register", "/api/auth"],
+  loginPath: "/login",
+});
+```
+
+### 4. useAuth フック設定
+
+```typescript
+// apps/app/src/hooks/use-auth.ts
+"use client";
+
+import { createUseAuth } from "@repo/features-auth/model";
+import { authClient } from "../lib/auth-client";
+
+export const useAuth = createUseAuth(authClient);
+```
+
+### 5. API ルート設定
+
+```typescript
+// apps/app/src/app/api/auth/[...all]/route.ts
+import { toNextJsHandler } from "better-auth/next-js";
+import { auth } from "../../../../lib/auth";
+
+export const { GET, POST } = toNextJsHandler(auth);
+```
+
+### 6. Proxy（ミドルウェア）設定
+
+```typescript
+// apps/app/src/proxy.ts
+import { NEMO } from "@rescale/nemo";
+import { authMiddleware } from "./lib/auth-middleware";
+
+const nemo = new NEMO(
+  {},
+  { before: authMiddleware },
+  { debug: process.env.NODE_ENV === "development" },
+);
+
+export function proxy(request, event) {
+  return nemo.middleware(request, event);
+}
+```
+
+## 環境変数
+
+```env
+# Better Auth 設定
+AUTH_SESSION_SECRET=your-secret-key-here
+BETTER_AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3000
+```
+
+## 使用方法
+
+### ログインフォーム
+
+```tsx
+import { LoginForm } from "@repo/features-auth/ui";
+import { useAuth } from "../../hooks/use-auth";
+
+const LoginPage = () => {
+  const { login } = useAuth();
+  
+  return (
+    <LoginForm
+      onSubmit={login}
+      onSuccess={() => router.push("/")}
+      onError={(error) => console.error(error)}
+    />
+  );
+};
+```
+
+### 認証状態の取得
+
+```tsx
+import { useAuth } from "../../hooks/use-auth";
+
+const ProfilePage = () => {
+  const { session, isLoading, isAuthenticated, logout } = useAuth();
+
+  if (isLoading) return <div>Loading...</div>;
+  if (!isAuthenticated) return <div>Not authenticated</div>;
+
+  return (
+    <div>
+      <p>Welcome, {session?.user?.name}</p>
+      <button onClick={logout}>Logout</button>
+    </div>
+  );
+};
+```
+
+## FSD 構造
+
+```
+packages/
+├── features/
+│   └── auth/                    # 認証機能（UI + Model）
+│       └── src/
+│           ├── ui/              # LoginForm
+│           └── model/           # createUseAuth
+├── shared/
+│   └── lib-auth/                # 認証ライブラリラッパー
+│       └── src/
+│           ├── lib/             # createAuth, createAuthClient, createAuthMiddleware
+│           └── types/           # 型定義
+apps/
+└── app/
+    └── src/
+        ├── lib/                 # auth.ts, auth-client.ts, auth-middleware.ts
+        ├── hooks/               # use-auth.ts
+        ├── app/
+        │   ├── login/           # ログインページ
+        │   └── api/auth/        # Better Auth API ルート
+        └── proxy.ts             # 認証ミドルウェア統合
+```
+
+## ベストプラクティス
+
+### 設定の分離
+
+- **パッケージ**: 汎用的なロジックのみを提供（ファクトリー関数）
+- **アプリケーション**: 固有の設定（環境変数、パス設定など）を行う
+
+```typescript
+// ❌ Bad - パッケージ内で設定をハードコード
+export const auth = createAuth({
+  secret: "hardcoded-secret",
+  publicPaths: ["/login"],
+});
+
+// ✅ Good - アプリケーションで設定
+// packages/shared/lib-auth/src/lib/create-auth.ts
+export const createAuth = (config: AuthConfig) => { ... };
+
+// apps/app/src/lib/auth.ts
+export const auth = createAuth({
+  secret: process.env.AUTH_SESSION_SECRET,
+});
+```
+
+### 型安全性
+
+```typescript
+// 型定義をインポートして使用
+import type { AuthConfig, AuthMiddlewareConfig } from "@repo/shared-lib-auth/types";
+```
+
+### エラーハンドリング
+
+```typescript
+const { login } = useAuth();
+
+try {
+  await login(email, password);
+} catch (error) {
+  // エラーハンドリング
+}
+```
+
+## 参考リンク
+
+- [Better Auth - Stateless Session Management](https://www.better-auth.com/docs/concepts/session-management#stateless-session-management)
+- [Feature Sliced Design](https://feature-sliced.design/)

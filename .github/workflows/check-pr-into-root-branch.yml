@@ -1,0 +1,52 @@
+name: ルートブランチへのPRのチェック
+
+on:
+  pull_request:
+    paths:
+      - "apps/**"
+      - "packages/**"
+      - ".github/workflows/check-pr-into-root-branch.yml"
+    branches:
+      - main
+      - develop
+
+jobs:
+  # PRの場合のみ実行するジョブ
+  check-code-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup pnpm and Node.js
+        uses: ./.github/actions/setup-pnpm
+
+      - name: Install dependencies
+        uses: ./.github/actions/install-deps
+
+      - name: Run code quality checks
+        uses: ./.github/actions/run-checks
+        with:
+          # check-pr.yml で実行するチェックするので lint,format 項目を指定しない
+          checks: "check:type,package:format"
+
+  # ビルドジョブ（PRとPushの両方で実行）
+  build:
+    runs-on: ubuntu-latest
+    needs: [check-code-quality]
+    # 依存ジョブがスキップされた場合の条件分岐
+    if: |
+      always() &&
+      (needs.check-code-quality.result == 'success' || needs.check-code-quality.result == 'skipped')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup pnpm and Node.js
+        uses: ./.github/actions/setup-pnpm
+
+      - name: Install dependencies
+        uses: ./.github/actions/install-deps
+
+      - name: Build application
+        uses: ./.github/actions/build-app

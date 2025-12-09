@@ -1,0 +1,33 @@
+{
+  "name": "@repo/shared-ui-layout",
+  "version": "0.0.0",
+  "dependencies": {
+    "@ark-ui/react": "5.29.1",
+    "@repo/shared-config-tailwind": "workspace:*",
+    "@repo/shared-ui-icon": "workspace:*",
+    "@tailwindcss/postcss": "4.1.17",
+    "postcss": "8.5.6",
+    "react": "19.2.1",
+    "react-dom": "19.2.1",
+    "tailwind-variants": "3.2.2",
+    "tailwindcss": "4.1.17"
+  },
+  "devDependencies": {
+    "@repo/shared-config-typescript": "workspace:*",
+    "@types/node": "24.10.2",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "typescript": "5"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./package.json": "./package.json",
+    "./ui/*": "./src/ui/*/index.tsx"
+  },
+  "private": true,
+  "scripts": {
+    "check:types": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0"
+  },
+  "type": "module"
+}
