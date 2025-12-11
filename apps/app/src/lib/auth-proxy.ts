@@ -18,12 +18,5 @@ import { auth } from "./auth";
  * ```
  */
 export const authProxy = createAuthProxy(auth, {
-  publicPaths: [
-    "/login",
-    "/register",
-    "/forgot-password",
-    // TODO: 削除
-    "/api-test",
-    "/todos",
-  ],
+  publicPaths: ["/login", "/register", "/forgot-password"],
 });
