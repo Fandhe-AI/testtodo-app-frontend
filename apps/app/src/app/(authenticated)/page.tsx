@@ -7,7 +7,6 @@ import { auth } from "~/lib/auth";
  * 認証チェックはLayoutで行われるため、ここではセッション取得のみ
  */
 export default async function Page() {
-  // Layoutで認証済みなのでsessionは必ず存在する
   const session = await auth.api.getSession({
     headers: await headers(),
   });

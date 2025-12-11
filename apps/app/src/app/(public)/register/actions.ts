@@ -1,7 +1,7 @@
 "use server";
 
 import { createRegister } from "@repo/features-auth";
-import { env } from "~/const/env";
+import { auth } from "~/lib/auth";
 
 /**
  * 登録 Server Action
@@ -11,5 +11,5 @@ import { env } from "~/const/env";
  * @returns 登録アクション
  */
 export const register = createRegister({
-  apiBaseURL: env.AUTH_API_BASE_URL,
+  auth,
 });
