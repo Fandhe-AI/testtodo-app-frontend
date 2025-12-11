@@ -4,7 +4,8 @@ import { auth } from "./auth";
 /**
  * 認証プロキシ
  *
- * アプリケーション固有の認証プロキシ設定を行います。
+ * セッションを厳格に検証し、未認証または期限切れの場合は
+ * callbackURL付きでログインページにリダイレクトします。
  *
  * @example
  * ```typescript
@@ -18,12 +19,5 @@ import { auth } from "./auth";
  * ```
  */
 export const authProxy = createAuthProxy(auth, {
-  publicPaths: [
-    "/login",
-    "/register",
-    "/forgot-password",
-    // TODO: 削除
-    "/api-test",
-    "/todos",
-  ],
+  publicPaths: ["/login", "/register", "/forgot-password"],
 });

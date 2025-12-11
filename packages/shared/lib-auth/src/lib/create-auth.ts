@@ -31,6 +31,7 @@ export const createAuth = ({
   secret,
   baseURL,
   sessionMaxAge = 7 * 24 * 60 * 60,
+  strategy = "jwt",
   options = {},
 }: AuthConfig): BetterAuthReturn => {
   return betterAuth({
@@ -44,6 +45,7 @@ export const createAuth = ({
       cookieCache: {
         enabled: true,
         maxAge: sessionMaxAge,
+        strategy,
         ...options.session?.cookieCache,
       },
     },

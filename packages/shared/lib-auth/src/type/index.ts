@@ -1,6 +1,15 @@
 import type { BetterAuthOptions } from "better-auth";
 
 /**
+ * セッション Cookie キャッシュの戦略
+ * - compact: 最小サイズ
+ * - jwt: JWT互換性、外部連携向け
+ * - jwe: 最大セキュリティ、暗号化（推奨）
+ * @see https://www.better-auth.com/docs/concepts/session-management#cookie-cache-strategies
+ */
+export type SessionStrategy = "compact" | "jwt" | "jwe";
+
+/**
  * 認証設定の型定義
  */
 export type AuthConfig = {
@@ -20,6 +29,16 @@ export type AuthConfig = {
    * @default 604800 (7日間)
    */
   sessionMaxAge?: number;
+
+  /**
+   * Cookie キャッシュの戦略
+   * - compact: 最小サイズ
+   * - jwt: JWT互換性、外部連携向け
+   * - jwe: 最大セキュリティ、暗号化（推奨）
+   * @default "jwt"
+   * @see https://www.better-auth.com/docs/concepts/session-management#cookie-cache-strategies
+   */
+  strategy: SessionStrategy;
 
   /**
    * Better Auth の追加オプション
