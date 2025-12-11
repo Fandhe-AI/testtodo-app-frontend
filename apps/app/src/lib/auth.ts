@@ -15,4 +15,9 @@ export const auth = createAuth({
   baseURL: env.AUTH_API_BASE_URL,
   sessionMaxAge: 7 * 24 * 60 * 60, // 7日間
   strategy: "jwt",
+  options: {
+    emailAndPassword: {
+      enabled: true,
+    },
+  },
 });

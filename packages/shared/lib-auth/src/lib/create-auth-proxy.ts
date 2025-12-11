@@ -24,7 +24,7 @@ const matchesPath = (pathname: string, paths: readonly string[]): boolean => {
 /**
  * 認証プロキシを作成
  *
- * リクエストのセッションを検証し、未認証の場合はログインページにリダイレクトします。
+ * セッションを厳格に検証し、未認証または期限切れの場合はcallbackURL付きでログインページにリダイレクトします。
  *
  * @param auth - Better Auth インスタンス
  * @param config - プロキシ設定
@@ -74,16 +74,14 @@ export const createAuthProxy = (auth: Auth, config: AuthProxyConfig = {}) => {
     }
 
     try {
-      // セッション検証
-      // Stateless Session Management: Cookie キャッシュからセッションを検証
+      // セッションを厳格に検証
       const session = await auth.api.getSession({
         headers: request.headers,
       });
 
       if (!session) {
-        // 未認証の場合はログインページにリダイレクト
+        // 未認証または期限切れの場合はログインページにリダイレクト
         const loginUrl = new URL(loginPath, request.url);
-        // リダイレクト後に元のページに戻れるようにパラメータを追加
         loginUrl.searchParams.set("callbackURL", pathname);
         return NextResponse.redirect(loginUrl);
       }
@@ -94,6 +92,7 @@ export const createAuthProxy = (auth: Auth, config: AuthProxyConfig = {}) => {
       // エラーが発生した場合はログインページにリダイレクト
       logger.error("Auth proxy error: %o", { error });
       const loginUrl = new URL(loginPath, request.url);
+      loginUrl.searchParams.set("callbackURL", pathname);
       return NextResponse.redirect(loginUrl);
     }
   };

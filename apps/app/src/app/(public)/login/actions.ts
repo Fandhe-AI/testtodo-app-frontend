@@ -1,7 +1,7 @@
 "use server";
 
 import { createLogin } from "@repo/features-auth";
-import { env } from "~/const/env";
+import { auth } from "~/lib/auth";
 
 /**
  * ログイン Server Action
@@ -11,5 +11,5 @@ import { env } from "~/const/env";
  * @returns ログインアクション
  */
 export const login = createLogin({
-  apiBaseURL: env.AUTH_API_BASE_URL,
+  auth,
 });
