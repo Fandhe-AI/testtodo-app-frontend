@@ -63,11 +63,9 @@ export const createRegister = ({
     } = result.data;
 
     try {
-      const headerList = await headers();
-
       await auth.api.signUpEmail({
         body: { email, password, name },
-        headers: headerList,
+        headers: await headers(),
       });
 
       // 登録成功後、リダイレクト

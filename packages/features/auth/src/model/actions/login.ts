@@ -58,11 +58,9 @@ export const createLogin = ({
     const { email, password, callbackURL = defaultCallbackURL } = result.data;
 
     try {
-      const headerList = await headers();
-
       await auth.api.signInEmail({
         body: { email, password },
-        headers: headerList,
+        headers: await headers(),
       });
 
       // ログイン成功後、リダイレクト

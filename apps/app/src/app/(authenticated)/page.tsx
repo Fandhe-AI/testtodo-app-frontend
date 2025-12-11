@@ -6,7 +6,7 @@ import { auth } from "~/lib/auth";
  *
  * 認証チェックはLayoutで行われるため、ここではセッション取得のみ
  */
-export default async function Page() {
+export default async () => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -17,4 +17,4 @@ export default async function Page() {
       <p>Welcome, {session?.user.name ?? session?.user.email}</p>
     </div>
   );
-}
+};
