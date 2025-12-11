@@ -44,6 +44,7 @@ export const createAuth = ({
       cookieCache: {
         enabled: true,
         maxAge: sessionMaxAge,
+        strategy: "jwt",
         ...options.session?.cookieCache,
       },
     },
