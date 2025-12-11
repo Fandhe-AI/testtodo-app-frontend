@@ -107,9 +107,18 @@ export const createLogin = ({
             k !== "httponly" &&
             k !== "secure",
         );
-        const value = name ? cookieObj[name] : undefined;
+        const rawValue = name ? cookieObj[name] : undefined;
 
-        if (!name || !value) continue;
+        if (!name || !rawValue) continue;
+
+        // Cookie値を安全にデコード（ダブルエンコード防止）
+        // 不正なエンコーディングやエンコードされていない値の場合は元の値を使用
+        let value: string;
+        try {
+          value = decodeURIComponent(rawValue);
+        } catch {
+          value = rawValue;
+        }
 
         cookieStore.set({
           name,
