@@ -7,17 +7,6 @@ import Database from "better-sqlite3";
 const SESSION_MAX_AGE = 7 * 24 * 60 * 60;
 
 /**
- * セッション戦略を取得（無効な値の場合はデフォルト値を返す）
- */
-const getSessionStrategy = (): "compact" | "jwt" | "jwe" => {
-  const value = process.env.AUTH_SESSION_STRATEGY;
-  if (value === "compact" || value === "jwt" || value === "jwe") {
-    return value;
-  }
-  return "jwe";
-};
-
-/**
  * SQLiteデータベースインスタンス
  *
  * better-sqlite3を使用してローカルのSQLiteデータベースに接続します。
@@ -73,7 +62,7 @@ export const auth = betterAuth({
     cookieCache: {
       enabled: true,
       maxAge: SESSION_MAX_AGE,
-      strategy: getSessionStrategy(),
+      strategy: process.env.AUTH_SESSION_STRATEGY,
     },
     expiresIn: SESSION_MAX_AGE,
   },

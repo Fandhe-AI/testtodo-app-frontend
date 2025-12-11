@@ -35,7 +35,7 @@ export type AuthConfig = {
    * - compact: 最小サイズ
    * - jwt: JWT互換性、外部連携向け
    * - jwe: 最大セキュリティ、暗号化（推奨）
-   * @default "jwe"
+   * @default "jwt"
    * @see https://www.better-auth.com/docs/concepts/session-management#cookie-cache-strategies
    */
   strategy: SessionStrategy;
