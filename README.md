@@ -1,135 +1,104 @@
-# Turborepo starter
+# TestTodo App Frontend
 
-This Turborepo starter is maintained by the Turborepo core team.
+Next.js ベースのモノレポ構成 Todo アプリケーションです。
 
-## Using this example
+## 技術スタック
 
-Run the following command:
+- **Next.js 16** (App Router)
+- **React 19** + React Compiler
+- **TypeScript 5**
+- **Tailwind CSS 4**
+- **Turborepo** - ビルドシステム
+- **pnpm** - パッケージマネージャー
+- **Biome** - Linter / Formatter
 
-```sh
-npx create-turbo@latest
+## プロジェクト構造
+
+```text
+testtodo-app-frontend/
+├── apps/
+│   ├── app/                     # メイン Next.js アプリ (port 3000)
+│   └── mock/                    # 認証モックサーバー (port 8000)
+├── packages/
+│   ├── pages/                   # ページコンポーネント (FSD)
+│   ├── widgets/                 # ウィジェットコンポーネント (FSD)
+│   ├── features/                # 機能モジュール (FSD)
+│   ├── entities/                # エンティティ (FSD)
+│   └── shared/                  # 共有パッケージ
+│       ├── api-*/               # API クライアント・型定義
+│       ├── config-*/            # 設定パッケージ
+│       ├── lib-*/               # ライブラリ
+│       └── ui-*/                # UI コンポーネント
+└── .cursor/rules/               # 開発ガイドライン
 ```
 
-## What's inside?
+このプロジェクトは **Feature Sliced Design (FSD)** アーキテクチャに従っています。
 
-This Turborepo includes the following packages/apps:
+## 機能
 
-### Apps and Packages
+- ユーザー認証（ログイン / 新規登録）
+- Todo の作成・表示・管理
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+## 開発環境セットアップ
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+### 前提条件
 
-### Utilities
+- Node.js 22.21.1 (Volta 推奨)
+- pnpm 10.24.0
 
-This Turborepo has some additional tools already setup for you:
+### セットアップ手順
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+```bash
+# 一括セットアップ（推奨）
+make setup
 
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+# 開発サーバーの起動
+pnpm dev
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+## Makefile コマンド
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+```bash
+make setup              # 環境構築を一括実行
+make setup-env          # 環境変数ファイルを .env.example からコピー
+make setup-volta        # Volta のインストールと Node.js セットアップ
+make setup-pnpm         # pnpm install
+make setup-lefthook     # Git hooks のインストール
+make setup-better-auth  # 認証用 DB マイグレーション
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+## 主要コマンド
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+```bash
+# 開発
+pnpm dev                    # 全アプリを開発モードで起動
+pnpm dev --filter=app       # メインアプリのみ起動
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+# ビルド
+pnpm build                  # 全パッケージをビルド
 
-### Remote Caching
+# コード品質
+pnpm lint                   # リントチェック
+pnpm lint:fix               # リント修正
+pnpm format                 # フォーマットチェック
+pnpm format:fix             # フォーマット修正
+pnpm check:type             # 型チェック
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+# API 生成
+pnpm generate:api           # API クライアント・型を生成
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+# パッケージ管理
+pnpm package:list           # パッケージバージョン一覧
+pnpm package:update         # パッケージ更新チェック
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+## 開発ガイドライン
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+詳細なガイドラインは `.cursor/rules/` ディレクトリを参照してください。
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+- [project-overview.mdc](.cursor/rules/project-overview.mdc) - プロジェクト概要
+- [feature-sliced-design.mdc](.cursor/rules/feature-sliced-design.mdc) - FSD アーキテクチャ
+- [coding-standards.mdc](.cursor/rules/coding-standards.mdc) - コーディング規約
+- [nextjs-guidelines.mdc](.cursor/rules/nextjs-guidelines.mdc) - Next.js ガイドライン
+- [api-guidelines.mdc](.cursor/rules/api-guidelines.mdc) - API ガイドライン
+- [monorepo-guidelines.mdc](.cursor/rules/monorepo-guidelines.mdc) - モノレポガイドライン
