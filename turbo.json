@@ -24,6 +24,13 @@
       "inputs": ["$TURBO_DEFAULT$", ".env.example", ".env"],
       "outputs": ["src/**"],
       "cache": false
+    },
+    "storybook:dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "storybook:build": {
+      "outputs": ["storybook-static/**"]
     }
   }
 }

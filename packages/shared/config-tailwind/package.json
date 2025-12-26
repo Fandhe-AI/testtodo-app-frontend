@@ -2,7 +2,7 @@
   "name": "@repo/shared-config-tailwind",
   "version": "0.0.0",
   "exports": {
-    "./config/*": "./src/config/*.css"
+    "./config/*": "./src/config/*"
   },
   "private": true
 }

@@ -41,7 +41,9 @@
     "package:lint:fix": "syncpack lint",
     "package:list": "syncpack list",
     "package:update": "syncpack update --check",
-    "package:update:fix": "syncpack update"
+    "package:update:fix": "syncpack update",
+    "storybook": "pnpm -r --filter './packages/**' run storybook:dev",
+    "storybook:build": "pnpm -r --filter './packages/**' run storybook:build"
   },
   "volta": {
     "node": "22.21.1",
