@@ -12,6 +12,7 @@
     "@repo/shared-config-tailwind": "workspace:*",
     "@repo/shared-lib-auth": "workspace:*",
     "@repo/shared-lib-pino": "workspace:*",
+    "@repo/shared-ui-icon": "workspace:*",
     "@rescale/nemo": "2.0.2",
     "@tailwindcss/postcss": "4.1.17",
     "babel-plugin-react-compiler": "1.0.0",

@@ -2,8 +2,12 @@
   "name": "@repo/shared-config-typescript",
   "version": "0.0.0",
   "exports": {
-    "./*": "./src/config/*.json"
+    "./package.json": "./package.json",
+    "./base.json": "./src/config/base.json",
+    "./api.json": "./src/config/api.json",
+    "./react-library.json": "./src/config/react-library.json",
+    "./nextjs.json": "./src/config/nextjs.json",
+    "./root.json": "./src/config/root.json"
   },
-  "private": true,
-  "type": "module"
+  "private": true
 }

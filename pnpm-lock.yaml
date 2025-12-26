@@ -77,6 +77,9 @@ importers:
       '@repo/shared-lib-pino':
         specifier: workspace:*
         version: link:../../packages/shared/lib-pino
+      '@repo/shared-ui-icon':
+        specifier: workspace:*
+        version: link:../../packages/shared/ui-icon
       '@rescale/nemo':
         specifier: 2.0.2
         version: 2.0.2(next@16.0.8(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))
@@ -175,16 +178,37 @@ importers:
       '@repo/shared-api-type':
         specifier: workspace:*
         version: link:../../shared/api-type
+      '@repo/shared-config-storybook':
+        specifier: workspace:*
+        version: link:../../shared/config-storybook
+      '@repo/shared-ui-icon':
+        specifier: workspace:*
+        version: link:../../shared/ui-icon
+      '@storybook/react-vite':
+        specifier: ^10.1.10
+        version: 10.1.10(esbuild@0.27.1)(msw@2.12.4(@types/node@24.10.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(rollup@4.54.0)(storybook@10.1.10(@testing-library/dom@10.4.1)(prettier@2.8.8)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(typescript@5.9.3)(vite@6.4.1(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))
+      '@tailwindcss/postcss':
+        specifier: 4.1.17
+        version: 4.1.17
+      postcss:
+        specifier: 8.5.6
+        version: 8.5.6
       react:
         specifier: 19.2.1
         version: 19.2.1
       react-dom:
         specifier: 19.2.1
         version: 19.2.1(react@19.2.1)
+      storybook:
+        specifier: ^10.1.10
+        version: 10.1.10(@testing-library/dom@10.4.1)(prettier@2.8.8)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+      tailwind-variants:
+        specifier: 3.1.1
+        version: 3.1.1(tailwindcss@4.1.17)
+      tailwindcss:
+        specifier: 4.1.17
+        version: 4.1.17
     devDependencies:
-      '@repo/shared-config-storybook':
-        specifier: workspace:*
-        version: link:../../shared/config-storybook
       '@repo/shared-config-typescript':
         specifier: workspace:*
         version: link:../../shared/config-typescript
@@ -200,9 +224,6 @@ importers:
       '@types/react-dom':
         specifier: 19.2.3
         version: 19.2.3(@types/react@19.2.7)
-      storybook:
-        specifier: ^10.1.10
-        version: 10.1.10(@testing-library/dom@10.4.1)(prettier@2.8.8)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       typescript:
         specifier: '5'
         version: 5.9.3
@@ -264,15 +285,39 @@ importers:
       '@repo/shared-api-zod':
         specifier: workspace:*
         version: link:../../shared/api-zod
+      '@repo/shared-config-storybook':
+        specifier: workspace:*
+        version: link:../../shared/config-storybook
       '@repo/shared-lib-pino':
         specifier: workspace:*
         version: link:../../shared/lib-pino
+      '@repo/shared-ui-icon':
+        specifier: workspace:*
+        version: link:../../shared/ui-icon
+      '@storybook/react-vite':
+        specifier: ^10.1.10
+        version: 10.1.10(esbuild@0.27.1)(msw@2.12.4(@types/node@24.10.2)(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(rollup@4.54.0)(storybook@10.1.10(@testing-library/dom@10.4.1)(prettier@2.8.8)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(typescript@5.9.3)(vite@6.4.1(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))
+      '@tailwindcss/postcss':
+        specifier: 4.1.17
+        version: 4.1.17
+      postcss:
+        specifier: 8.5.6
+        version: 8.5.6
       react:
         specifier: 19.2.1
         version: 19.2.1
       react-dom:
         specifier: 19.2.1
         version: 19.2.1(react@19.2.1)
+      storybook:
+        specifier: ^10.1.10
+        version: 10.1.10(@testing-library/dom@10.4.1)(prettier@2.8.8)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+      tailwind-variants:
+        specifier: 3.1.1
+        version: 3.1.1(tailwindcss@4.1.17)
+      tailwindcss:
+        specifier: 4.1.17
+        version: 4.1.17
       zod:
         specifier: 4.1.13
         version: 4.1.13
@@ -280,9 +325,6 @@ importers:
       '@repo/shared-config-kubb':
         specifier: workspace:*
         version: link:../../shared/config-kubb
-      '@repo/shared-config-storybook':
-        specifier: workspace:*
-        version: link:../../shared/config-storybook
       '@repo/shared-config-typescript':
         specifier: workspace:*
         version: link:../../shared/config-typescript
@@ -298,9 +340,6 @@ importers:
       '@types/react-dom':
         specifier: 19.2.3
         version: 19.2.3(@types/react@19.2.7)
-      storybook:
-        specifier: ^10.1.10
-        version: 10.1.10(@testing-library/dom@10.4.1)(prettier@2.8.8)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       typescript:
         specifier: '5'
         version: 5.9.3
@@ -570,6 +609,9 @@ importers:
       '@storybook/addon-a11y':
         specifier: ^10.1.10
         version: 10.1.10(storybook@10.1.10(@testing-library/dom@10.4.1)(prettier@2.8.8)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))
+      '@storybook/addon-themes':
+        specifier: ^10.1.10
+        version: 10.1.10(storybook@10.1.10(@testing-library/dom@10.4.1)(prettier@2.8.8)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))
       '@storybook/react':
         specifier: ^10.1.10
         version: 10.1.10(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(storybook@10.1.10(@testing-library/dom@10.4.1)(prettier@2.8.8)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(typescript@5.9.3)
@@ -591,6 +633,10 @@ importers:
       vite:
         specifier: ^6.3.5
         version: 6.4.1(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)
+    devDependencies:
+      '@repo/shared-config-typescript':
+        specifier: workspace:*
+        version: link:../config-typescript
 
   packages/shared/config-syncpack: {}
 
@@ -669,6 +715,9 @@ importers:
       '@tailwindcss/postcss':
         specifier: 4.1.17
         version: 4.1.17
+      lucide-react:
+        specifier: ^0.469.0
+        version: 0.469.0(react@19.2.1)
       postcss:
         specifier: 8.5.6
         version: 8.5.6
@@ -2031,6 +2080,11 @@ packages:
 
   '@storybook/addon-a11y@10.1.10':
     resolution: {integrity: sha512-lXVFywCSdA39uCR0KEFz3F6WTjzoqSi5gQYtWrFelzaUiMH46uBLHPYaKlpUuNbTL/o9ctrhX1YNzegujrXSoQ==}
+    peerDependencies:
+      storybook: ^10.1.10
+
+  '@storybook/addon-themes@10.1.10':
+    resolution: {integrity: sha512-YlTzREQnUFZ6wepo4MppiobkFrsF1EuObh+vaEhjEj5Cs1oH+kqP5Db+rXi8rbrxnVXaWKmDgqZMtB7kVN4Dnw==}
     peerDependencies:
       storybook: ^10.1.10
 
@@ -3748,6 +3802,11 @@ packages:
   lru-queue@0.1.0:
     resolution: {integrity: sha512-BpdYkt9EvGl8OfWHDQPISVpcl5xZthb+XPsbELj5AQXxIC8IriDZIQYjBJPEm5rS420sjZ0TLEzRcq5KdBhYrQ==}
 
+  lucide-react@0.469.0:
+    resolution: {integrity: sha512-28vvUnnKQ/dBwiCQtwJw7QauYnE7yd2Cyp4tTTJpvglX4EMpbflcdBgrgToX2j71B3YvugK/NH3BGUk+E/p/Fw==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
     hasBin: true
@@ -4547,6 +4606,16 @@ packages:
   tagged-tag@1.0.0:
     resolution: {integrity: sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng==}
     engines: {node: '>=20'}
+
+  tailwind-variants@3.1.1:
+    resolution: {integrity: sha512-ftLXe3krnqkMHsuBTEmaVUXYovXtPyTK7ckEfDRXS8PBZx0bAUas+A0jYxuKA5b8qg++wvQ3d2MQ7l/xeZxbZQ==}
+    engines: {node: '>=16.x', pnpm: '>=7.x'}
+    peerDependencies:
+      tailwind-merge: '>=3.0.0'
+      tailwindcss: '*'
+    peerDependenciesMeta:
+      tailwind-merge:
+        optional: true
 
   tailwind-variants@3.2.2:
     resolution: {integrity: sha512-Mi4kHeMTLvKlM98XPnK+7HoBPmf4gygdFmqQPaDivc3DpYS6aIY6KiG/PgThrGvii5YZJqRsPz0aPyhoFzmZgg==}
@@ -6281,6 +6350,11 @@ snapshots:
       '@storybook/global': 5.0.0
       axe-core: 4.11.0
       storybook: 10.1.10(@testing-library/dom@10.4.1)(prettier@2.8.8)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+
+  '@storybook/addon-themes@10.1.10(storybook@10.1.10(@testing-library/dom@10.4.1)(prettier@2.8.8)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))':
+    dependencies:
+      storybook: 10.1.10(@testing-library/dom@10.4.1)(prettier@2.8.8)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+      ts-dedent: 2.2.0
 
   '@storybook/builder-vite@10.1.10(esbuild@0.27.1)(msw@2.12.4(@types/node@24.10.2)(typescript@5.9.3))(rollup@4.54.0)(storybook@10.1.10(@testing-library/dom@10.4.1)(prettier@2.8.8)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(vite@6.4.1(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))':
     dependencies:
@@ -8235,6 +8309,10 @@ snapshots:
     dependencies:
       es5-ext: 0.10.64
 
+  lucide-react@0.469.0(react@19.2.1):
+    dependencies:
+      react: 19.2.1
+
   lz-string@1.5.0: {}
 
   magic-string@0.30.21:
@@ -9098,6 +9176,10 @@ snapshots:
       syncpack-windows-x64: 14.0.0-alpha.32
 
   tagged-tag@1.0.0: {}
+
+  tailwind-variants@3.1.1(tailwindcss@4.1.17):
+    dependencies:
+      tailwindcss: 4.1.17
 
   tailwind-variants@3.2.2(tailwindcss@4.1.17):
     dependencies:

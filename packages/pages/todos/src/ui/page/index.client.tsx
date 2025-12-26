@@ -1,16 +1,15 @@
 "use client";
 
-import { type Todo, TodoStatus } from "@repo/entities-todo";
+import type { Todo } from "@repo/entities-todo";
 import type {
   createCreate,
   createDelete,
   createToggle,
 } from "@repo/features-todo";
-import { TodoFilterStatus } from "@repo/features-todo/ui/filter/status";
 import { TodoFormAdd } from "@repo/features-todo/ui/form/add";
 import { TodoList } from "@repo/features-todo/ui/list";
 import type { Pagination } from "@repo/shared-api-type/todo";
-import { use } from "react";
+import { useState } from "react";
 import type { TodosPageSearchParams } from "../../model";
 
 type Props = {
@@ -32,7 +31,7 @@ type Props = {
   onDelete: ReturnType<typeof createDelete>;
   /**
    * ページタイトル
-   * @default "Todo リスト"
+   * @default "やることリスト"
    */
   title?: string;
   /**
@@ -48,73 +47,85 @@ type Props = {
  * Todos ページのクライアントコンポーネント
  */
 export const ClientPage = ({
-  searchParams,
   onAdd,
   onToggle,
   onDelete,
-  title = "Todo リスト",
+  title = "やることリスト",
   initialData,
 }: Props) => {
-  const params = use(searchParams);
+  const [todos, setTodos] = useState(initialData.todos);
 
-  let status: TodoStatus | "all" = "all";
-  if (params.status) {
-    if (Object.values(TodoStatus).includes(params.status as TodoStatus)) {
-      status = params.status as TodoStatus;
-    }
-  }
+  const handleTodoAdded = (todo: Todo) => {
+    setTodos((prev) => [...prev, todo]);
+  };
 
-  // フィルター変更
-  const handleStatusChange = (status: string) => {
-    const url = new URL(window.location.href);
-    if (status === "all") {
-      url.searchParams.delete("status");
-    } else {
-      url.searchParams.set("status", status);
+  const handleToggle = async (todoId: string) => {
+    // 楽観的更新
+    setTodos((prev) =>
+      prev.map((todo) =>
+        todo.id === todoId
+          ? {
+              ...todo,
+              status: todo.status === "completed" ? "todo" : "completed",
+            }
+          : todo,
+      ),
+    );
+
+    try {
+      const result = await onToggle(todoId);
+      return result;
+    } catch {
+      // エラー時は元に戻す
+      setTodos((prev) =>
+        prev.map((todo) =>
+          todo.id === todoId
+            ? {
+                ...todo,
+                status: todo.status === "completed" ? "todo" : "completed",
+              }
+            : todo,
+        ),
+      );
+      throw new Error("Failed to toggle todo");
     }
-    window.history.pushState({}, "", url.toString());
-    // リロードしてサーバーから新しいデータを取得
-    window.location.href = url.toString();
+  };
+
+  const handleDelete = async (todoId: string) => {
+    // 楽観的更新
+    setTodos((prev) => prev.filter((todo) => todo.id !== todoId));
+
+    try {
+      const result = await onDelete(todoId);
+      return result;
+    } catch {
+      // エラー時は元に戻す - 実際にはサーバーから再取得が必要
+      throw new Error("Failed to delete todo");
+    }
   };
 
   return (
-    <div
-      className={[
-        "flex min-h-screen flex-col",
-        "bg-linear-to-br from-[#1a1a2e] to-[#16213e]",
-      ].join(" ")}
-    >
+    <div className="flex min-h-screen flex-col bg-white dark:bg-slate-950">
       {/* ヘッダー */}
-      <header className="border-white/10 border-b p-6">
-        <div className="mx-auto max-w-4xl">
-          <h1 className="font-semibold text-2xl text-white tracking-wide">
+      <header className="border-slate-200 border-b bg-white px-6 py-5 dark:border-slate-800 dark:bg-slate-950">
+        <div className="mx-auto max-w-3xl">
+          <h1 className="font-semibold text-2xl text-slate-900 dark:text-white">
             {title}
           </h1>
         </div>
       </header>
 
       {/* メインコンテンツ */}
-      <main className="flex-1 p-6">
-        <div className="mx-auto max-w-4xl space-y-6">
-          {/* フィルター */}
-          <div className="flex items-center justify-between">
-            <TodoFilterStatus
-              currentStatus={status}
-              onStatusChange={handleStatusChange}
-            />
-            <p className="text-sm text-white/40">
-              {initialData.pagination.total} 件
-            </p>
-          </div>
-
+      <main className="flex-1 bg-slate-50 px-6 py-8 dark:bg-slate-900">
+        <div className="mx-auto max-w-3xl space-y-4">
           {/* Todo 追加フォーム */}
-          <TodoFormAdd action={onAdd} />
+          <TodoFormAdd action={onAdd} onTodoAdded={handleTodoAdded} />
 
           {/* Todo リスト */}
           <TodoList
-            initialTodos={initialData.todos}
-            onToggle={onToggle}
-            onDelete={onDelete}
+            todos={todos}
+            onToggle={handleToggle}
+            onDelete={handleDelete}
           />
         </div>
       </main>

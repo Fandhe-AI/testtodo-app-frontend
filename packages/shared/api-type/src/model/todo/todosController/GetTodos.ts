@@ -3,7 +3,7 @@ import type { Pagination } from "../Pagination";
 import type { Todo } from "../Todo";
 
 export const GetTodosQueryParamsStatus = {
-    "pending": "pending",
+    "todo": "todo",
     "completed": "completed",
     "all": "all"
 } as const;

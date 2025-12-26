@@ -1,3 +1,4 @@
+import { IconSprite } from "@repo/shared-ui-icon";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
@@ -14,7 +15,10 @@ export const metadata: Metadata = {
 export default ({ children }: Props) => {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <IconSprite />
+        {children}
+      </body>
     </html>
   );
 };

@@ -7,7 +7,8 @@
       "src/ui/*": "@repo/entities-todo/ui/$1"
     },
     "documentUrlSubstitutions": {
-      "<FIGMA_TODO_BADGE>": "https://figma.com/design/YOUR_FILE_KEY?node-id=TODO_BADGE_NODE_ID",
+      "<FIGMA_TODO_BUTTON>": "https://www.figma.com/design/IeovHYw1bhQRUjkWqiQHo3/TestToDo_App?node-id=150-3209&t=CJvuf2weGZVgSJG5-4",
+      "<FIGMA_TODO_BADGE>": "https://www.figma.com/design/IeovHYw1bhQRUjkWqiQHo3/TestToDo_App?node-id=150-3177&t=CJvuf2weGZVgSJG5-4",
       "<FIGMA_TODO_CARD>": "https://figma.com/design/YOUR_FILE_KEY?node-id=TODO_CARD_NODE_ID"
     }
   }

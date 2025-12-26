@@ -1,8 +1,7 @@
-import { parseSubmission, report } from "@conform-to/react/future";
+import type { Todo } from "@repo/entities-todo";
 import { postTodos } from "@repo/shared-api-client/todo";
 import type { RequestConfig } from "@repo/shared-config-kubb";
 import type { CreateRequest } from "../../model";
-import { createSchema } from "../schemas";
 
 /**
  * Todo を作成する Server Action
@@ -14,42 +13,51 @@ export const createCreate = (
   config?: Partial<RequestConfig<CreateRequest>>,
 ) => {
   return async (_prevState: unknown, formData: FormData) => {
-    const submission = parseSubmission(formData);
-    const result = createSchema.safeParse(submission.payload);
+    const title = formData.get("title");
+    const priority = formData.get("priority");
 
-    if (!result.success) {
-      return report(submission, {
-        error: {
-          issues: result.error.issues,
-        },
-      });
+    if (!title || typeof title !== "string" || title.trim() === "") {
+      return {
+        error: "タイトルを入力してください",
+      };
     }
 
-    const { title, description, priority, categoryId, dueDate } = result.data;
+    if (!priority || typeof priority !== "string") {
+      return {
+        error: "優先度を選択してください",
+      };
+    }
 
     try {
-      await postTodos(
+      const response = await postTodos(
         {
-          title,
-          description,
-          priority,
-          category_id: categoryId,
-          due_date: dueDate,
+          title: title.trim(),
+          priority: priority as "low" | "medium" | "high",
         },
         config,
       );
 
-      return report(submission, {
-        reset: true,
-      });
+      // APIレスポンス（snake_case）をTodo型（camelCase）に変換
+      const newTodo: Todo = {
+        id: response.id,
+        title: response.title,
+        description: response.description,
+        status: response.status,
+        priority: response.priority,
+        categoryId: response.category_id,
+        dueDate: response.due_date,
+        createdAt: response.created_at,
+        updatedAt: response.updated_at,
+      };
+
+      return {
+        success: true,
+        value: newTodo,
+      };
     } catch (error) {
-      return report(submission, {
-        error: {
-          formErrors: [
-            String(error instanceof Error ? error.message : "Unknown error"),
-          ],
-        },
-      });
+      return {
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   };
 };

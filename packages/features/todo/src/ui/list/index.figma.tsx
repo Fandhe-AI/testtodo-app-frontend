@@ -9,22 +9,19 @@ import { TodoList } from "./index";
  * URL は figma.config.json の documentUrlSubstitutions で管理しています。
  * 実際の Figma URL に接続するには、figma.config.json を編集してください。
  *
- * figma.children() の使用例:
- * - Figma上で "Todo Items" レイヤー配下に配置されたTodoCardコンポーネントを取得
- * - TodoListは内部でTodoCardをレンダリングするため、childrenとして表示
+ * 注意: 実装では todos: Todo[] を受け取り内部で map してレンダリングしますが、
+ * Figma 上では "Todo Items" レイヤー内の TodoCard インスタンスとして配置されます。
+ * figma.children() を使用して Figma 上の視覚的なレイアウトを表現しています。
  */
 figma.connect(TodoList, "<FIGMA_TODO_LIST>", {
   props: {
-    // 子コンポーネント - figma.children()
-    // Figma上の "Todo Items" レイヤー内のインスタンスを取得
+    // Figma 上の "Todo Items" レイヤー内に配置された TodoCard インスタンス
+    // 実装では todos.map((todo) => <TodoCard {...todo} />) で生成
     todoItems: figma.children("Todo Items"),
   },
   example: ({ todoItems }) => (
-    // TodoListは内部でinitialTodosからTodoCardを生成するが、
-    // Figma上ではchildrenとして視覚的に表現される
-    <div className="space-y-3">
-      {/* figma.children() で取得した子コンポーネントを表示 */}
-      {todoItems}
-    </div>
+    // Figma 上の視覚的なレイアウトを表現
+    // 実際の使用: <TodoList todos={[...]} onToggle={...} onDelete={...} />
+    <div className="space-y-2">{todoItems}</div>
   ),
 });

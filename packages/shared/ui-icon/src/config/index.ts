@@ -7,7 +7,12 @@ export const ICON_PREFIX_GRADIENT = `${ICON_PREFIX}-gradient`;
 export const IconLogo = {} as const;
 export type IconLogo = (typeof IconLogo)[keyof typeof IconLogo];
 
-export const IconSymbol = {} as const;
+export const IconSymbol = {
+  arrowDown: "arrow-down",
+  arrowUp: "arrow-up",
+  minus: "minus",
+  plus: "plus",
+} as const;
 export type IconSymbol = (typeof IconSymbol)[keyof typeof IconSymbol];
 
 export const IconGradient = {} as const;

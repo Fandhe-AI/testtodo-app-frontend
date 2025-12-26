@@ -1,4 +1,5 @@
 import type { StorybookConfig } from "@storybook/react-vite";
+import { getAbsolutePath } from "./utils/get-absolute-path.ts";
 
 /**
  * 共通のStorybookメイン設定を作成
@@ -13,9 +14,12 @@ export const createMainConfig = (
 ): StorybookConfig => {
   return {
     stories: ["../src/**/*.stories.@(ts|tsx)"],
-    addons: ["@storybook/addon-a11y"],
+    addons: [
+      getAbsolutePath("@storybook/addon-a11y"),
+      getAbsolutePath("@storybook/addon-themes"),
+    ],
     framework: {
-      name: "@storybook/react-vite",
+      name: getAbsolutePath("@storybook/react-vite"),
       options: {},
     },
     viteFinal: async (config) => {

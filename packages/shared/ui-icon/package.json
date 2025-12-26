@@ -4,6 +4,7 @@
   "dependencies": {
     "@repo/shared-config-tailwind": "workspace:*",
     "@tailwindcss/postcss": "4.1.17",
+    "lucide-react": "^0.469.0",
     "postcss": "8.5.6",
     "react": "19.2.1",
     "react-dom": "19.2.1",

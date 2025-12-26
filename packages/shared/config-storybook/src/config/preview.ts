@@ -1,3 +1,4 @@
+import { withThemeByClassName } from "@storybook/addon-themes";
 import type { Preview } from "@storybook/react";
 import "./style.css";
 
@@ -6,9 +7,9 @@ import "./style.css";
  *
  * @example
  * // .storybook/preview.ts
- * export { preview as default } from "@repo/shared-config-storybook/preview";
+ * export { default } from "@repo/shared-config-storybook/preview";
  */
-export const preview: Preview = {
+const preview: Preview = {
   parameters: {
     controls: {
       matchers: {
@@ -17,11 +18,18 @@ export const preview: Preview = {
       },
     },
     backgrounds: {
-      default: "dark",
-      values: [
-        { name: "dark", value: "#0a0a0a" },
-        { name: "light", value: "#ffffff" },
-      ],
+      disable: true, // Themes addonと重複するため無効化
     },
   },
+  decorators: [
+    withThemeByClassName({
+      themes: {
+        light: "bg-white",
+        dark: "dark bg-[#333]",
+      },
+      defaultTheme: "light",
+    }),
+  ],
 };
+
+export default preview;

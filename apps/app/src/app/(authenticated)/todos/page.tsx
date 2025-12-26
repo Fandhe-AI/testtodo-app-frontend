@@ -16,7 +16,7 @@ export default async (props: Props) => {
 
   // 初期データを取得
   const initialData = await getTodos({
-    status: params.status as "pending" | "completed" | "all" | undefined,
+    status: params.status as "todo" | "completed" | "all" | undefined,
     category: params.category,
     priority: params.priority as "low" | "medium" | "high" | undefined,
     search: params.search,

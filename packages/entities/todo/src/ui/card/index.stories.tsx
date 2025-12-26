@@ -9,7 +9,7 @@ const meta: Meta<typeof TodoCard> = {
     id: "1",
     title: "タスクのタイトル",
     description: "タスクの詳細説明です。",
-    status: "pending",
+    status: "todo",
     priority: "medium",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -19,7 +19,7 @@ const meta: Meta<typeof TodoCard> = {
   argTypes: {
     status: {
       control: "select",
-      options: ["pending", "completed"],
+      options: ["todo", "completed"],
       description: "タスクのステータス",
     },
     priority: {
@@ -27,9 +27,9 @@ const meta: Meta<typeof TodoCard> = {
       options: ["low", "medium", "high"],
       description: "優先度",
     },
-    isPending: {
+    isProcessing: {
       control: "boolean",
-      description: "操作中かどうか",
+      description: "処理中かどうか",
     },
   },
 };
@@ -45,48 +45,10 @@ export const Completed: Story = {
   },
 };
 
-export const HighPriority: Story = {
+export const Processing: Story = {
   args: {
-    priority: "high",
-    title: "緊急タスク",
-    description: "これは緊急のタスクです。すぐに対応が必要です。",
-  },
-};
-
-export const LowPriority: Story = {
-  args: {
-    priority: "low",
-    title: "低優先度タスク",
-    description: "時間があるときに対応すれば大丈夫です。",
-  },
-};
-
-export const WithDueDate: Story = {
-  args: {
-    dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-    title: "期限付きタスク",
-  },
-};
-
-export const Pending: Story = {
-  args: {
-    isPending: true,
+    isProcessing: true,
     title: "処理中のタスク",
-  },
-};
-
-export const WithoutDescription: Story = {
-  args: {
-    description: undefined,
-    title: "説明なしタスク",
-  },
-};
-
-export const ReadOnly: Story = {
-  args: {
-    onToggle: undefined,
-    onDelete: undefined,
-    title: "読み取り専用タスク",
   },
 };
 
@@ -95,39 +57,59 @@ export const AllStates: Story = {
     <div className="space-y-3">
       <TodoCard
         id="1"
-        title="未完了・高優先度"
+        title="高優先度タスク"
         description="緊急対応が必要"
-        status="pending"
+        status="todo"
         priority="high"
         createdAt={new Date().toISOString()}
         updatedAt={new Date().toISOString()}
+        onToggle={() => {}}
+        onDelete={() => {}}
       />
       <TodoCard
         id="2"
-        title="未完了・中優先度"
+        title="中優先度タスク"
         description="通常のタスク"
-        status="pending"
+        status="todo"
         priority="medium"
         createdAt={new Date().toISOString()}
         updatedAt={new Date().toISOString()}
+        onToggle={() => {}}
+        onDelete={() => {}}
       />
       <TodoCard
         id="3"
-        title="未完了・低優先度"
+        title="低優先度タスク"
         description="時間があるときに"
-        status="pending"
+        status="todo"
         priority="low"
         createdAt={new Date().toISOString()}
         updatedAt={new Date().toISOString()}
+        onToggle={() => {}}
+        onDelete={() => {}}
       />
       <TodoCard
         id="4"
-        title="完了済み"
+        title="完了済みタスク"
         description="このタスクは完了しました"
         status="completed"
         priority="medium"
         createdAt={new Date().toISOString()}
         updatedAt={new Date().toISOString()}
+        onToggle={() => {}}
+        onDelete={() => {}}
+      />
+      <TodoCard
+        id="5"
+        title="処理中のタスク"
+        description="現在処理中です"
+        status="todo"
+        priority="medium"
+        isProcessing={true}
+        createdAt={new Date().toISOString()}
+        updatedAt={new Date().toISOString()}
+        onToggle={() => {}}
+        onDelete={() => {}}
       />
     </div>
   ),

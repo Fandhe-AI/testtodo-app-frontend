@@ -1,16 +1,58 @@
-import type { ComponentProps, SVGProps } from "react";
-import { Root } from "../root";
-import { Use } from "../use";
+import type { LucideProps } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Check,
+  Loader2,
+  Minus,
+  Pencil,
+  Plus,
+  Trash2,
+  X,
+} from "lucide-react";
 
-type UseProps = ComponentProps<typeof Use>;
+/**
+ * アイコン名とLucideコンポーネントのマッピング
+ */
+const iconMap = {
+  plus: Plus,
+  minus: Minus,
+  "arrow-up": ArrowUp,
+  "arrow-down": ArrowDown,
+  loader: Loader2,
+  trash: Trash2,
+  edit: Pencil,
+  check: Check,
+  x: X,
+} as const;
 
-type Props = Omit<SVGProps<SVGSVGElement>, "children"> & {
-  type?: UseProps["type"];
-  name: UseProps["name"];
+/**
+ * 利用可能なアイコン名の型
+ */
+export type IconName = keyof typeof iconMap;
+
+/**
+ * Iconコンポーネントのprops
+ */
+type Props = Omit<LucideProps, "ref"> & {
+  /**
+   * アイコン名
+   */
+  name: IconName;
 };
 
-export const Icon = ({ type = "symbol", name, ...props }: Props) => (
-  <Root name={name} {...props}>
-    <Use type={type} name={name} />
-  </Root>
-);
+/**
+ * アイコンコンポーネント
+ *
+ * Lucideアイコンライブラリをラップしたコンポーネントです。
+ *
+ * @example
+ * ```tsx
+ * <Icon name="plus" className="h-4 w-4" />
+ * <Icon name="arrow-up" className="h-3.5 w-3.5" />
+ * ```
+ */
+export const Icon = ({ name, ...props }: Props) => {
+  const LucideIcon = iconMap[name];
+  return <LucideIcon {...props} />;
+};
