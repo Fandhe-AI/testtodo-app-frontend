@@ -8,10 +8,13 @@
     "react-dom": "19.2.1"
   },
   "devDependencies": {
+    "@repo/shared-config-storybook": "workspace:*",
     "@repo/shared-config-typescript": "workspace:*",
+    "@storybook/react": "^10.1.10",
     "@types/node": "24.10.2",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
+    "storybook": "^10.1.10",
     "typescript": "5"
   },
   "exports": {
@@ -22,7 +25,10 @@
   },
   "private": true,
   "scripts": {
-    "check:type": "tsc --noEmit"
+    "check:type": "tsc --noEmit",
+    "figma:publish": "figma connect publish",
+    "storybook:build": "storybook build",
+    "storybook:dev": "storybook dev -p 6006"
   },
   "type": "module"
 }
