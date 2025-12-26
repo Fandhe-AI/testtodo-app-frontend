@@ -30,7 +30,8 @@
   },
   "private": true,
   "scripts": {
-    "check:type": "tsc --noEmit"
+    "check:type": "tsc --noEmit",
+    "figma:publish": "figma connect publish"
   },
   "type": "module"
 }

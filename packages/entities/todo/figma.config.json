@@ -1,0 +1,14 @@
+{
+  "codeConnect": {
+    "include": ["src/ui/**/*.figma.tsx"],
+    "exclude": ["node_modules", "dist"],
+    "label": "React (@repo/entities-todo)",
+    "importPaths": {
+      "src/ui/*": "@repo/entities-todo/ui/$1"
+    },
+    "documentUrlSubstitutions": {
+      "<FIGMA_TODO_BADGE>": "https://figma.com/design/YOUR_FILE_KEY?node-id=TODO_BADGE_NODE_ID",
+      "<FIGMA_TODO_CARD>": "https://figma.com/design/YOUR_FILE_KEY?node-id=TODO_CARD_NODE_ID"
+    }
+  }
+}
