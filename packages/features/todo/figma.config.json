@@ -1,0 +1,15 @@
+{
+  "codeConnect": {
+    "include": ["src/ui/**/*.tsx"],
+    "exclude": ["node_modules", "dist"],
+    "label": "React (@repo/features-todo)",
+    "importPaths": {
+      "src/ui/*": "@repo/features-todo/ui/$1"
+    },
+    "documentUrlSubstitutions": {
+      "<FIGMA_TODO_PRIORITY_SELECTOR>": "https://www.figma.com/design/IeovHYw1bhQRUjkWqiQHo3/TestToDo_App?node-id=175-279&t=6b9cWSU9HJrH5sIi-4",
+      "<FIGMA_TODO_FORM_ADD>": "https://www.figma.com/design/IeovHYw1bhQRUjkWqiQHo3/TestToDo_App?node-id=173-10003&t=6b9cWSU9HJrH5sIi-4",
+      "<FIGMA_TODO_LIST>": "https://www.figma.com/design/IeovHYw1bhQRUjkWqiQHo3/TestToDo_App?node-id=173-10097&t=6b9cWSU9HJrH5sIi-4"
+    }
+  }
+}

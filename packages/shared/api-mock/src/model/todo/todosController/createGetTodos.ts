@@ -7,7 +7,7 @@ import { faker } from "@faker-js/faker";
 export function createGetTodosQueryParams(data?: Partial<GetTodosQueryParams>): GetTodosQueryParams {
   
   return {
-  ...{"status": faker.helpers.arrayElement<NonNullable<GetTodosQueryParams>["status"]>(["pending", "completed", "all"]),"category": faker.string.alpha(),"priority": faker.helpers.arrayElement<NonNullable<GetTodosQueryParams>["priority"]>(["low", "medium", "high"]),"search": faker.string.alpha(),"page": faker.number.int({ min: 1 }),"limit": faker.number.int({ min: 1, max: 100 }),"sort": faker.helpers.arrayElement<NonNullable<GetTodosQueryParams>["sort"]>(["created_at", "updated_at", "due_date", "priority", "title"]),"order": faker.helpers.arrayElement<NonNullable<GetTodosQueryParams>["order"]>(["asc", "desc"])},
+  ...{"status": faker.helpers.arrayElement<NonNullable<GetTodosQueryParams>["status"]>(["todo", "completed", "all"]),"category": faker.string.alpha(),"priority": faker.helpers.arrayElement<NonNullable<GetTodosQueryParams>["priority"]>(["low", "medium", "high"]),"search": faker.string.alpha(),"page": faker.number.int({ min: 1 }),"limit": faker.number.int({ min: 1, max: 100 }),"sort": faker.helpers.arrayElement<NonNullable<GetTodosQueryParams>["sort"]>(["created_at", "updated_at", "due_date", "priority", "title"]),"order": faker.helpers.arrayElement<NonNullable<GetTodosQueryParams>["order"]>(["asc", "desc"])},
   ...data || {}
   }
 }

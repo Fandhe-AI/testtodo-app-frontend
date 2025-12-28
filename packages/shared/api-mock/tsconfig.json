@@ -1,5 +1,5 @@
 {
-  "extends": "@repo/shared-config-typescript/api",
+  "extends": "@repo/shared-config-typescript/api.json",
   "include": ["src"],
   "exclude": ["node_modules"]
 }

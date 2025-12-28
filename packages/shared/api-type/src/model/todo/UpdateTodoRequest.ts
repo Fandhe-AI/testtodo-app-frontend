@@ -1,5 +1,5 @@
 export const UpdateTodoRequestStatus = {
-    "pending": "pending",
+    "todo": "todo",
     "completed": "completed"
 } as const;
 

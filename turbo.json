@@ -24,6 +24,22 @@
       "inputs": ["$TURBO_DEFAULT$", ".env.example", ".env"],
       "outputs": ["src/**"],
       "cache": false
+    },
+    "storybook:dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "storybook:build": {
+      "outputs": ["storybook-static/**"]
+    },
+    "figma:publish": {
+      "cache": false,
+      "env": ["FIGMA_ACCESS_TOKEN"],
+      "inputs": [
+        "src/ui/**/*.figma.tsx",
+        "figma.config.json"
+      ]
     }
-  }
+  },
+  "globalEnv": ["FIGMA_ACCESS_TOKEN"]
 }

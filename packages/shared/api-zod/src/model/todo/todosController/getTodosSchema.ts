@@ -4,7 +4,7 @@ import { todoSchema } from "../todoSchema";
 import { z } from "zod/v4";
 
 export const getTodosQueryParamsSchema = z.object({
-    "status": z.enum(["pending", "completed", "all"]).default("all").describe("Todo の完了状態でフィルタリング"),
+    "status": z.enum(["todo", "completed", "all"]).default("all").describe("Todo の完了状態でフィルタリング"),
 "category": z.optional(z.string().describe("カテゴリ ID でフィルタリング")),
 "priority": z.optional(z.enum(["low", "medium", "high"]).describe("優先度でフィルタリング")),
 "search": z.optional(z.string().describe("タイトルや説明での検索")),
