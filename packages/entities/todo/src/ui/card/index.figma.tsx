@@ -10,6 +10,7 @@ import { TodoCard } from "./index";
  * 実際の Figma URL に接続するには、figma.config.json を編集してください。
  */
 figma.connect(TodoCard, "<FIGMA_TODO_CARD>", {
+  imports: ["import { TodoCard } from '@repo/entities-todo/ui/card'"],
   props: {
     // テキストプロパティ - figma.string()
     title: figma.string("Title"),

@@ -10,6 +10,9 @@ import { TodoPrioritySelector } from "./index";
  * 実際の Figma URL に接続するには、figma.config.json を編集してください。
  */
 figma.connect(TodoPrioritySelector, "<FIGMA_TODO_PRIORITY_SELECTOR>", {
+  imports: [
+    "import { TodoPrioritySelector } from '@repo/features-todo/ui/priority-selector'",
+  ],
   props: {
     // バリアントプロパティ - figma.enum()
     value: figma.enum("Priority", {
@@ -19,7 +22,9 @@ figma.connect(TodoPrioritySelector, "<FIGMA_TODO_PRIORITY_SELECTOR>", {
     }),
 
     // Booleanプロパティ - figma.boolean()
-    disabled: figma.boolean("Disabled"),
+    disabled: figma.enum("State", {
+      Disabled: true,
+    }),
   },
   example: ({ value, disabled }) => (
     <TodoPrioritySelector

@@ -25,19 +25,16 @@ FSD（Feature-Sliced Design）アーキテクチャに沿って、各パッケ�
 
 ```
 packages/
-├── entities/
-│   └── todo/
-│       ├── figma.config.json        # entities/todo 専用設定（URL管理含む）
-│       └── src/ui/
-│           ├── badge/
-│           │   └── index.figma.tsx  # TodoBadge 接続
-│           └── card/
-│               └── index.figma.tsx  # TodoCard 接続
-└── features/
-    └── todo/
-        ├── figma.config.json        # features/todo 専用設定（URL管理含む）
-        └── src/ui/
-            └── ...
+├── entities/todo/
+│   ├── figma.config.json
+│   └── src/ui/
+│       ├── button/index.figma.tsx
+│       ├── card/index.figma.tsx
+│       └── ...
+└── features/todo/
+    ├── figma.config.json
+    └── src/ui/
+        └── ...
 ```
 
 ### URL の管理方法
@@ -49,10 +46,15 @@ Figma コンポーネントの URL は `figma.config.json` の `documentUrlSubst
 // figma.config.json
 {
   "codeConnect": {
-    "include": ["src/ui/**/*.figma.tsx"],
+    "include": ["src/ui/**/*.tsx"],
+    "exclude": ["node_modules", "dist"],
+    "label": "React (@repo/entities-todo)",
+    "importPaths": {
+      "src/ui/*": "@repo/entities-todo/ui/$1"
+    },
     "documentUrlSubstitutions": {
-      "<FIGMA_TODO_BADGE>": "https://figma.com/design/FILE_KEY?node-id=BADGE_NODE_ID",
-      "<FIGMA_TODO_CARD>": "https://figma.com/design/FILE_KEY?node-id=CARD_NODE_ID"
+      "<FIGMA_TODO_BUTTON>": "https://figma.com/design/...",
+      "<FIGMA_TODO_CARD>": "https://figma.com/design/..."
     }
   }
 }
@@ -60,7 +62,10 @@ Figma コンポーネントの URL は `figma.config.json` の `documentUrlSubst
 
 ```tsx
 // index.figma.tsx（プレースホルダーを使用）
-figma.connect(TodoBadge, "<FIGMA_TODO_BADGE>", { ... });
+figma.connect(TodoButton, "<FIGMA_TODO_BUTTON>", {
+  props: { ... },
+  example: (props) => <TodoButton {...props} />
+});
 ```
 
 ---
@@ -82,34 +87,29 @@ figma.connect(TodoBadge, "<FIGMA_TODO_BADGE>", { ... });
 4. **Personal access tokens** セクションで **Generate new token** をクリック
 5. トークン名を入力（例: `code-connect`）
 6. 以下の権限を付与：
-   - **Code Connect: Write**
-   - **File content: Read**
+  - **Code Connect: Write**
+  - **File content: Read**
 7. **Generate token** をクリック
 8. 表示されたトークンをコピー（一度しか表示されません）
 
-### 環境変数での管理（推奨）
+### 環境変数での管理
+
+プロジェクトルートの `.env` ファイルにトークンを設定：
 
 ```bash
-# .zshrc or .bashrc に追加
-export FIGMA_TOKEN="your-token-here"
+# .env
+FIGMA_TOKEN=your-token-here
 ```
 
 ---
 
 ## Figma コンポーネントの準備
 
-### コンポーネントの作成
-
-1. Figma でコンポーネントを作成
-2. **右クリック** → **Create component** でコンポーネント化
-3. バリアントを設定（例: Status, Priority）
-
 ### コンポーネント URL の取得
 
-1. Figma で **Dev Mode** に切り替え（右上のトグル）
+1. Figma で **Dev Mode** に切り替え
 2. 接続したいコンポーネントを選択
 3. **右クリック** → **Copy link to selection**
-4. クリップボードにコピーされた URL を使用
 
 ---
 
@@ -122,11 +122,15 @@ export FIGMA_TOKEN="your-token-here"
 ```json
 {
   "codeConnect": {
-    "include": ["src/ui/**/*.figma.tsx"],
+    "include": ["src/ui/**/*.tsx"],
     "exclude": ["node_modules", "dist"],
+    "label": "React (@repo/entities-todo)",
+    "importPaths": {
+      "src/ui/*": "@repo/entities-todo/ui/$1"
+    },
     "documentUrlSubstitutions": {
-      "<FIGMA_TODO_BADGE>": "https://figma.com/design/FILE_KEY?node-id=BADGE_NODE_ID",
-      "<FIGMA_NEW_COMPONENT>": "https://figma.com/design/FILE_KEY?node-id=NEW_NODE_ID"
+      "<FIGMA_TODO_BUTTON>": "https://figma.com/design/...",
+      "<FIGMA_NEW_COMPONENT>": "https://figma.com/design/..."
     }
   }
 }
@@ -142,6 +146,7 @@ import figma from "@figma/code-connect";
 import { NewComponent } from "./index";
 
 figma.connect(NewComponent, "<FIGMA_NEW_COMPONENT>", {
+  imports: ["import { NewComponent } from '@repo/entities-todo/ui/new-component'"],
   props: {
     // プロパティマッピング
   },
@@ -152,14 +157,11 @@ figma.connect(NewComponent, "<FIGMA_NEW_COMPONENT>", {
 ### CLI による自動生成（オプション）
 
 ```bash
-# パッケージディレクトリに移動
 cd packages/entities/todo
-
-# コンポーネントリンクから自動生成
-npx figma connect create "https://figma.com/design/FILE_KEY?node-id=NODE_ID" --token=$FIGMA_TOKEN
-
-# 生成後、URL をプレースホルダーに置き換え、figma.config.json に追加
+npx figma connect create "https://figma.com/design/..."
 ```
+
+生成後、URL をプレースホルダーに置き換え、`figma.config.json` に追加してください。
 
 ---
 
@@ -180,9 +182,7 @@ npx figma connect create "https://figma.com/design/FILE_KEY?node-id=NODE_ID" --t
 ```tsx
 figma.connect(Button, "...", {
   props: {
-    // Figma の "Type" バリアントプロパティをマッピング
     type: figma.enum("Type", {
-      // Figma の値: コードの値
       Primary: "primary",
       Secondary: "secondary",
       Danger: "danger",
@@ -197,8 +197,6 @@ figma.connect(Button, "...", {
 ```tsx
 figma.connect(Button, "...", {
   props: {
-    // Figma の "Disabled" プロパティをマッピング
-    // true/false, yes/no, on/off を自動的に正規化
     disabled: figma.boolean("Disabled"),
   },
   example: ({ disabled }) => <Button disabled={disabled} />,
@@ -210,7 +208,6 @@ figma.connect(Button, "...", {
 ```tsx
 figma.connect(Card, "...", {
   props: {
-    // instance-swap プロパティをマッピング
     icon: figma.instance("Leading Icon"),
   },
   example: ({ icon }) => (
@@ -226,90 +223,47 @@ figma.connect(Card, "...", {
 
 ## 公開・更新の手順
 
-### 単一パッケージの公開
+### 全パッケージの一括公開（推奨）
 
 ```bash
-# パッケージディレクトリに移動
-cd packages/entities/todo
-
-# 公開
-npx figma connect publish --token=$FIGMA_TOKEN
-```
-
-### 全パッケージの一括公開
-
-```bash
-# プロジェクトルートから
 pnpm figma:publish
 ```
 
-**注意:** このコマンドはすべてのパッケージの `figma:publish` スクリプトを実行します。
-
-### 公開の確認
-
-1. Figma で Dev Mode に切り替え
-2. 接続したコンポーネントを選択
-3. 右パネルにコードスニペットが表示される
-
-### 接続の削除（非公開化）
+### 単一パッケージの公開
 
 ```bash
 cd packages/entities/todo
-npx figma connect unpublish --token=$FIGMA_TOKEN
+npx figma connect publish
+```
+
+公開後、Figma の Dev Mode でコンポーネントを選択すると、右パネルにコードスニペットが表示されます。
+
+### 接続の削除
+
+```bash
+cd packages/entities/todo
+npx figma connect unpublish
 ```
 
 ---
 
 ## トラブルシューティング
 
-### "No Code Connect files found" エラー
+### "No Code Connect files found"
 
-**原因:** `figma.config.json` の `include` パターンがファイルにマッチしていない
+`figma.config.json` の `include` パスと `.figma.tsx` ファイルの配置場所を確認してください。
 
-**解決策:**
-1. `figma.config.json` の `include` パスを確認
-2. `.figma.tsx` ファイルの配置場所を確認
+### "Invalid Figma URL"
 
-```json
-{
-  "codeConnect": {
-    "include": ["src/ui/**/*.figma.tsx"]
-  }
-}
-```
+Dev Mode でコンポーネントを選択し、右クリック → "Copy link to selection" で URL を再取得してください。
 
-### "Invalid Figma URL" エラー
+### "Unauthorized"
 
-**原因:** Figma コンポーネントの URL が不正
-
-**解決策:**
-1. Dev Mode でコンポーネントを選択
-2. 右クリック → "Copy link to selection" で URL を再取得
-3. URL が `https://figma.com/design/...?node-id=...` 形式であることを確認
-
-### "Unauthorized" エラー
-
-**原因:** トークンの権限不足または無効
-
-**解決策:**
-1. Figma Settings → Security でトークンを確認
-2. 必要な権限が付与されていることを確認：
-   - Code Connect: Write
-   - File content: Read
-3. トークンを再生成
+Figma Settings → Security でトークンの権限（Code Connect: Write / File content: Read）を確認してください。
 
 ### プロパティマッピングが反映されない
 
-**原因:** Figma 側のプロパティ名とコード側のマッピング名が一致していない
-
-**解決策:**
-1. Figma でプロパティ名を確認（Design Panel → Properties）
-2. `figma.enum()` などの第一引数を正確に指定
-
-```tsx
-// Figma のプロパティ名が "Priority Level" の場合
-priority: figma.enum("Priority Level", { ... })
-```
+Figma のプロパティ名（Design Panel → Properties）と `figma.enum()` などの第一引数が一致しているか確認してください。
 
 ---
 

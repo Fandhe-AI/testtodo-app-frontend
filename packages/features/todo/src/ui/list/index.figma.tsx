@@ -14,6 +14,7 @@ import { TodoList } from "./index";
  * figma.children() を使用して Figma 上の視覚的なレイアウトを表現しています。
  */
 figma.connect(TodoList, "<FIGMA_TODO_LIST>", {
+  imports: ["import { TodoList } from '@repo/features-todo/ui/list'"],
   props: {
     // Figma 上の "Todo Items" レイヤー内に配置された TodoCard インスタンス
     // 実装では todos.map((todo) => <TodoCard {...todo} />) で生成

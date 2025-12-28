@@ -13,6 +13,7 @@ import { TodoFormAdd } from "./index";
  * Figma では視覚的な表現のみを接続し、実際の動作は実装で提供されます。
  */
 figma.connect(TodoFormAdd, "<FIGMA_TODO_FORM_ADD>", {
+  imports: ["import { TodoFormAdd } from '@repo/features-todo/ui/form/add'"],
   example: () => (
     // 実際の使用: <TodoFormAdd action={createAction} onTodoAdded={handleAdded} />
     <TodoFormAdd

@@ -7,6 +7,9 @@ import { TodoPriorityChip } from "./index";
  * 情報表示専用（onClickなし）
  */
 figma.connect(TodoPriorityChip, "<FIGMA_TODO_PRIORITY_BADGE>", {
+  imports: [
+    "import { TodoPriorityChip } from '@repo/entities-todo/ui/priority-chip'",
+  ],
   props: {
     priority: figma.enum("Priority", {
       Low: "low",
@@ -26,6 +29,9 @@ figma.connect(TodoPriorityChip, "<FIGMA_TODO_PRIORITY_BADGE>", {
  * 選択可能（onClickあり）
  */
 figma.connect(TodoPriorityChip, "<FIGMA_TODO_PRIORITY_CHIP_INTERACTIVE>", {
+  imports: [
+    "import { TodoPriorityChip } from '@repo/entities-todo/ui/priority-chip'",
+  ],
   props: {
     priority: figma.enum("Priority", {
       Low: "low",
@@ -33,7 +39,9 @@ figma.connect(TodoPriorityChip, "<FIGMA_TODO_PRIORITY_CHIP_INTERACTIVE>", {
       High: "high",
     }),
     selected: figma.boolean("Selected"),
-    disabled: figma.boolean("Disabled"),
+    disabled: figma.enum("State", {
+      Disabled: true,
+    }),
   },
   example: ({ priority, selected, disabled }) => (
     <TodoPriorityChip

@@ -1,15 +1,15 @@
 {
   "codeConnect": {
-    "include": ["src/ui/**/*.figma.tsx"],
+    "include": ["src/ui/**/*.tsx"],
     "exclude": ["node_modules", "dist"],
     "label": "React (@repo/features-todo)",
     "importPaths": {
       "src/ui/*": "@repo/features-todo/ui/$1"
     },
     "documentUrlSubstitutions": {
-      "<FIGMA_TODO_FILTER_STATUS>": "https://figma.com/design/YOUR_FILE_KEY?node-id=TODO_FILTER_STATUS_NODE_ID",
-      "<FIGMA_TODO_FORM_ADD>": "https://figma.com/design/YOUR_FILE_KEY?node-id=TODO_FORM_ADD_NODE_ID",
-      "<FIGMA_TODO_LIST>": "https://figma.com/design/YOUR_FILE_KEY?node-id=TODO_LIST_NODE_ID"
+      "<FIGMA_TODO_PRIORITY_SELECTOR>": "https://www.figma.com/design/IeovHYw1bhQRUjkWqiQHo3/TestToDo_App?node-id=175-279&t=6b9cWSU9HJrH5sIi-4",
+      "<FIGMA_TODO_FORM_ADD>": "https://www.figma.com/design/IeovHYw1bhQRUjkWqiQHo3/TestToDo_App?node-id=173-10003&t=6b9cWSU9HJrH5sIi-4",
+      "<FIGMA_TODO_LIST>": "https://www.figma.com/design/IeovHYw1bhQRUjkWqiQHo3/TestToDo_App?node-id=173-10097&t=6b9cWSU9HJrH5sIi-4"
     }
   }
 }

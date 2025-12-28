@@ -31,6 +31,15 @@
     },
     "storybook:build": {
       "outputs": ["storybook-static/**"]
+    },
+    "figma:publish": {
+      "cache": false,
+      "env": ["FIGMA_ACCESS_TOKEN"],
+      "inputs": [
+        "src/ui/**/*.figma.tsx",
+        "figma.config.json"
+      ]
     }
-  }
+  },
+  "globalEnv": ["FIGMA_ACCESS_TOKEN"]
 }
